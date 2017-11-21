@@ -14,7 +14,7 @@ public class SortedGame {
 	public SortedGame(Game game) {
 		lineUp = game.getLineUp();
 		valid = lineUp.isValid();
-		scores = new ArrayList<String>();
+		scores = new ArrayList<>();
 		
 		for (int i = 0; i < lineUp.size(); i++) {
 			Long score = game.getScoreOf(lineUp.getIds()[i]);

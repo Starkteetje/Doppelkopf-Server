@@ -26,10 +26,10 @@ public class LoginToken {
 	@Column(nullable = false)
     private Date expiration_date;
 	
-	public LoginToken(Integer user_id, String token_value, Date expiration_date) {
-		this.user_id = user_id;
-		this.token_value = token_value;
-		this.expiration_date = expiration_date;
+	public LoginToken(Integer userId, String tokenValue, Date expirationDate) {
+		this.user_id = userId;
+		this.token_value = tokenValue;
+		this.expiration_date = expirationDate;
 	}
 	
 	public LoginToken() {

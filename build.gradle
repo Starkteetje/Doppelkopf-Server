@@ -7,6 +7,8 @@ buildscript {
     }
 }
 
+
+
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
@@ -23,11 +25,20 @@ repositories {
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
+processResources {
+    from 'resources'
+}
+    
+task data(type: Copy) {
+    from 'resources/templates' into 'resources/templates'
+}
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile group: 'org.springframework.security', name: 'spring-security-core', version: '3.1.0.RELEASE'
     compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.44'
-    testCompile('org.springframework.boot:spring-boot-starter-test')
-    testCompile('com.jayway.jsonpath:json-path')
+    compile group: 'org.apache.velocity', name: 'velocity', version: '1.7'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
 }
+

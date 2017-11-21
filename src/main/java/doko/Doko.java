@@ -1,11 +1,13 @@
 package doko;
 
 import doko.database.player.Player;
+import doko.database.user.User;
 import doko.database.game.SortedGame;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,22 +49,41 @@ public class Doko {
 	public ResponseEntity<List<String>> getGamePlayers() {
 		List<SortedGame> games = dokoService.getValidGames();
 		List<List<String>> names = games.stream().map(dokoService::getPlayerNames).collect(Collectors.toList());
-		List<String> argh = names.stream().map(list -> list.toString()).collect(Collectors.toList());
+		List<String> argh = names.stream().map(List::toString).collect(Collectors.toList());
+		
 		return new ResponseEntity<>(argh, HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/lineupgames", produces = "application/json")
-	public ResponseEntity<List<List<String>>> getLineUpGames(@RequestParam(value = "lineup", defaultValue = "1,2,3,4") String lineUpString) {
-		LineUp lineUp = new LineUp(lineUpString);
+	public ResponseEntity<List<List<String>>> getLineUpGames(LineUp lineUp) {
 		List<SortedGame> games = dokoService.getGamesForLineUp(lineUp);
 		List<List<String>> gamesScores = games.stream()
 				.map(SortedGame::getScores)
 				.collect(Collectors.toList());
 		List<String> names = dokoService.getPlayerNames(lineUp);
-		List<List<String>> namesAndGames = new ArrayList<List<String>>();
+		
+		List<List<String>> namesAndGames = new ArrayList<>();
 		namesAndGames.add(names);
 		namesAndGames.addAll(gamesScores);
+		
 		return new ResponseEntity<>(namesAndGames, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/lineupgames", produces = "application/json")
+	public ResponseEntity<List<List<String>>> getLineUpGames(@RequestParam(value = "lineup", defaultValue = "1,2,3,4") String lineUpString) {
+		LineUp lineUp = new LineUp(lineUpString);
+		return getLineUpGames(lineUp);
+	}
+	
+	@GetMapping(value = "/userinfo", produces = "application/json")
+	public ResponseEntity<Map<String, String>> getUserInfo(@RequestParam(value = "id") String idString, @RequestHeader(value = "token") String token) throws DokoException {
+		//TODO validate token
+		User user = dokoService.getUser(idString);
+		return new ResponseEntity<>(user.asMap(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/velocity")
+	public ResponseEntity<String> getHtml() {
+		return new ResponseEntity<>(Velocity.getHtml(), HttpStatus.OK);
 	}
 	
 	/*

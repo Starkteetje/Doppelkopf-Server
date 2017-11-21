@@ -54,7 +54,7 @@ public class DokoService {
 	public List<String> getPlayerNames(List<Long> ids) {
 		List<Player> players = getPlayers(ids);
 		return players.stream()
-				.map(player -> player.getName())
+				.map(Player::getName)
 				.collect(Collectors.toList());
 	}
 	
@@ -76,6 +76,23 @@ public class DokoService {
 	
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
+	}
+	
+	public User getUser(String idString) throws DokoException {
+		try {
+			Long id = new Long(idString);
+			return getUser(id);
+		} catch (Exception e) {
+			throw new DokoException("Malformed ID or no such user exists.");
+		}
+	}
+	
+	public User getUser(Long id) throws DokoException {
+		if (id == null) {
+			throw new DokoException("Malformed ID.");
+		} else {
+			return userRepository.findOne(id);
+		}
 	}
 
 	@Autowired

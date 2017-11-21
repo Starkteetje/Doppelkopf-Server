@@ -1,5 +1,8 @@
 package doko.database.user;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,5 +46,13 @@ public class User {
 	
 	public String getEmail() {
 		return email;
+	}
+	
+	public Map<String, String> asMap() {
+		Map<String, String> map = new HashMap<>();
+		map.put("username", username);
+		map.put("password", password);
+		map.put("email", email);
+		return map;
 	}
 }
