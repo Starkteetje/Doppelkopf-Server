@@ -1,0 +1,24 @@
+<ul class="navigation">
+  <li class="left"><a href="index">AMST-Runde</a></li>
+  #foreach ($lineUp in $lineUps)
+  	#if($lineUp.getLineUpString() != "1,2,3,4")
+  		<li class=\"left\"><a href=\"lineupgames?lineup=$lineUp.getLineUpString() \"> $lineup.getLineUpAbbreviation() -Runde</a></li>
+  	#end
+  #end
+  <li class=\"left\"><div class=\"dropDown\">Weitere Runden<ul class=\"vertical\">
+  #foreach ($lineUp in $nonTopLineUps)
+	#if($lineUp.getLineUpString() != "1,2,3,4")
+  		<li class=\"left\"><a href=\"lineupgames?lineup=$lineUp.getLineUpString() \"> $lineup.getLineUpAbbreviation() -Runde</a></li>
+	#end
+  #end
+  </ul></div></li>
+  
+  #if ($user.isLoggedIn())
+  	<li class="right"><a href="report.php">Neue Ergebnisse eintragen</a></li>
+  
+  	<li class="right"><a href="logout.php">Ausloggen</a></li>
+  	<li class="right"><a href="profile.php">Profil</a></li>
+  #else
+  	<li class=\"right\"><a href=\"login.php\">Einloggen</a></li>
+  #end
+</ul>

@@ -54,6 +54,11 @@ public class LineUp {
 					.toArray(String[]::new));
 	}
 	
+	public String getLineUpAbbreviation() {
+		//TODO
+		return "not implemented yet";
+	}
+	
 	public boolean isValid() {
 		return valid;
 	}

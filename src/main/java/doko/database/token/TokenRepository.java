@@ -6,9 +6,9 @@ import javax.transaction.Transactional;
 import java.util.List;
 
 @Transactional
-public interface TokenRepository extends CrudRepository<LoginToken, Long> {
+public interface TokenRepository extends CrudRepository<Token, Long> {
 
-    List<LoginToken> findAll();
+    List<Token> findAll();
 
-    List<LoginToken> findByIdIn(List<Long> ids);
+    List<Token> findByIdIn(List<Long> ids);
 }

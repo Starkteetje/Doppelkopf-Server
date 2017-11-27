@@ -11,39 +11,39 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "login_tokens")
-public class LoginToken {
+public class Token {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 	
-	@Column(nullable = false)
-    private Integer user_id;
+	@Column(name="user_id", nullable = false)
+    private Integer userId;
 	
-	@Column(nullable = false)
-    private String token_value;
+	@Column(name="token_value", nullable = false)
+    private String tokenValue;
 	
-	@Column(nullable = false)
-    private Date expiration_date;
+	@Column(name="exiration_date", nullable = false)
+    private Date expirationDate;
 	
-	public LoginToken(Integer userId, String tokenValue, Date expirationDate) {
-		this.user_id = userId;
-		this.token_value = tokenValue;
-		this.expiration_date = expirationDate;
+	public Token(Integer userId, String tokenValue, Date expirationDate) {
+		this.userId = userId;
+		this.tokenValue = tokenValue;
+		this.expirationDate = expirationDate;
 	}
 	
-	public LoginToken() {
+	public Token() {
 	}
 	
 	public Integer getUserId() {
-		return user_id;
+		return userId;
 	}
 	
 	public String getTokenValue() {
-		return token_value;
+		return tokenValue;
 	}
 	
 	public Date getExpirationDate() {
-		return expiration_date;
+		return expirationDate;
 	}
 }
