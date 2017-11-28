@@ -30,6 +30,8 @@ processResources {
 }
     
 task data(type: Copy) {
+    from 'resources/css' into 'resources/css'
+    from 'resources/images' into 'resources/images'
     from 'resources/templates' into 'resources/templates'
 }
 

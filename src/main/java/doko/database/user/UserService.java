@@ -3,9 +3,11 @@ package doko.database.user;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import doko.DokoException;
 
+@Service
 public class UserService {
 
 	private UserRepository userRepository;

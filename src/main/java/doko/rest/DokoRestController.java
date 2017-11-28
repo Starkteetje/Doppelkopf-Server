@@ -7,7 +7,6 @@ import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.database.user.UserService;
 import doko.velocity.VelocityReturn;
-import doko.velocity.VelocityTemplateHandler;
 import doko.DokoException;
 import doko.LineUp;
 import doko.database.game.GameService;
@@ -33,6 +32,7 @@ public class DokoRestController {
 	private TokenService tokenService;
 	private UserService userService;
 	private VelocityReturn velocity = new VelocityReturn();
+	private ImageController imgController = new ImageController();
 	
 	@GetMapping(value = "/doko")
     public ResponseEntity<List<String>> getLineUp(@RequestParam(value = "lineup", defaultValue = "1,2,3,4") String lineUp) {
@@ -84,17 +84,32 @@ public class DokoRestController {
 	}
 	
 	@GetMapping(value = "/user", produces = "application/json")
-	public ResponseEntity<Map<String, String>> getUser(@RequestParam(value = "id") String idString, @RequestHeader(value = "token") String token) throws DokoException {
+	public ResponseEntity<Map<String, String>> getUser(@RequestParam(value = "id") String idString, @RequestHeader(value = "token", defaultValue = "") String token) throws DokoException {
 		if (tokenService.isTokenValid(token)) {
 			User user = userService.getUser(idString);
 			return new ResponseEntity<>(user.asMap(), HttpStatus.OK);
 		}
-		return new ResponseEntity<>(null, HttpStatus.UNAUTHORIZED); //TODO test and proper response
+		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); //TODO return error page
 	}
 	
 	@GetMapping(value = "/velocity")
 	public ResponseEntity<String> getHtml() {
 		return new ResponseEntity<>(velocity.getTestHtml(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/login", produces = "text/html")
+	public ResponseEntity<String> getLoginPage() {
+		return new ResponseEntity<>(velocity.getLoginPageHtml(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/style", produces = "text/css")
+	public ResponseEntity<String> getCSS() {
+		return new ResponseEntity<>(velocity.getCSS(), HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/dokoblatt.png", produces = "image/png")
+	public ResponseEntity<byte[]> getBackgroundPicture() {
+		return new ResponseEntity<>(imgController.getBackgroundImage(), HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	@Autowired
@@ -121,39 +136,4 @@ public class DokoRestController {
 	public void setUserService(UserService userService) {
 		this.userService = userService;
 	}
-	
-	/*
-	@PostMapping(value = "/companies", consumes = "application/json")
-    public ResponseEntity<String> prepareMailsForUser(@RequestHeader(value = "name", defaultValue = "") String name,
-                                                      @RequestHeader(value = "email", defaultValue = "") String email,
-                                                      @RequestHeader(value = "password", defaultValue = "") String password,
-                                                      @RequestHeader(value = "smtpUrl", defaultValue = "") String smtpURL,
-                                                      @RequestBody List<Long> companyIds) {
-
-        List<Company> companies = companyService.getCompanysByID(companyIds);
-
-        if (!StringUtils.isEmpty(password)) {
-            //send mails, if password was given
-            try {
-                mailService.sendMail(name, email, password, smtpURL, companies);
-            } catch (MailException e) {
-                log.error("could not send mail", e);
-                return new ResponseEntity<>("unable to create or send mails", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }
-
-        User user = userService.saveUser(name, email, companies);
-        return new ResponseEntity(user.getToken(), HttpStatus.OK);
-    }
-	
-	@RequestMapping(method = RequestMethod.GET, value = "/user")
-    public ResponseEntity<User> revisit(@RequestParam(value = "token") String token) {
-        User user = userRepository.findByToken(token);
-        if(user == null) {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        } else {
-            return new ResponseEntity(user, HttpStatus.OK);
-        }
-    }
-    */
 }

@@ -1,4 +1,4 @@
-			<h1>Doko-Ergebnisse</h1>
+			<h1>Login</h1>
 		<br />
 		$errors
 
@@ -13,12 +13,16 @@
 					<td class="noborder"><input type="password" name="password" /></td>
 				</tr>
 				<tr class="noborder">
-					<td class="noborder"><b>Eingeloggt bleiben</b></td>
+					<td class="noborder"><b>Eingeloggt bleiben*</b></td>
 					<td class="noborder"><input type="checkbox" name="remember_user" /></td>
 				</tr>
 				<tr class="noborder">
 					<td class="noborder"></td>
 					<td class="noborder"><input type="submit" value="Anmelden" /></td>
+				</tr>
+				<tr class="noborder">
+					<td class="noborder"></td>
+					<td class="noborder"><small>* this will set a cookie in your browser</small></td>
 				</tr>
 			</table>
 		</form>

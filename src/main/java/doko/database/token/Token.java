@@ -23,7 +23,7 @@ public class Token {
 	@Column(name="token_value", nullable = false)
     private String tokenValue;
 	
-	@Column(name="exiration_date", nullable = false)
+	@Column(name="expiration_date", nullable = false)
     private Date expirationDate;
 	
 	public Token(Integer userId, String tokenValue, Date expirationDate) {
