@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "players")
-public class Player {
+public class Player implements Comparable<Player> {
 
 	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -27,5 +27,23 @@ public class Player {
 	
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public int compareTo(Player otherPlayer) {
+		return Long.compare(id, otherPlayer.id);
+	}
+	
+	@Override
+	public boolean equals(Object otherPlayer) {
+		if (otherPlayer instanceof Player) {
+			return id == ((Player)otherPlayer).id;
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		return (int) id;
 	}
 }

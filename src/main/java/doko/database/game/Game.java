@@ -9,7 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import doko.LineUp;
+import doko.lineup.LineUp;
+import doko.lineup.UnnamedLineUp;
 
 @Entity
 @Table(name = "scores")
@@ -65,7 +66,7 @@ public class Game {
 	}
 	
 	public LineUp getLineUp() {
-		return new LineUp(player1, player2, player3, player4);
+		return new UnnamedLineUp(player1, player2, player3, player4);
 	}
 	
 	public Long getScoreOf(Long playerId) {
@@ -76,7 +77,7 @@ public class Game {
 		return null;
 	}
 	
-	public String prettyPrint() {
-		return player1 + "scored " + score1 + "points, " + player2 + "scored " + score2 + "points, " + player3 + "scored " + score3 + "points, " + player4 + "scored " + score4 + "points. Submitted at " + date.toString();
+	public Date getDate() {
+		return date;
 	}
 }

@@ -1,23 +1,23 @@
-package doko;
+package doko.lineup;
 
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class LineUp {
+public class UnnamedLineUp extends LineUp {
 	
 	private Long[] ids;
 	private String lineUpString;
 	private boolean valid;
 	private static int LINEUP_LENGTH = 4;
 	
-	public LineUp(Long... ids) {
+	public UnnamedLineUp(Long... ids) {
 		this.ids = ids;
 		Arrays.sort(this.ids, nullComparator);
 		valid = isValid(this.ids);
 		lineUpString = getLineUpString(this.ids);
 	}
 	
-	public LineUp(String... idStrings) {
+	public UnnamedLineUp(String... idStrings) {
 		// Long::new does not "sanitize" input, e.g. leading spaces break it
 		// Double::new does it however, thus an extra step
 		this(Arrays.stream(idStrings)
@@ -34,7 +34,7 @@ public class LineUp {
 				.toArray(Long[]::new));
 	}
 	
-	public LineUp(String lineUpString) {
+	public UnnamedLineUp(String lineUpString) {
 		this(lineUpString.split(","));
 	}
 	
@@ -54,11 +54,6 @@ public class LineUp {
 					.toArray(String[]::new));
 	}
 	
-	public String getLineUpAbbreviation() {
-		//TODO
-		return "not implemented yet";
-	}
-	
 	public boolean isValid() {
 		return valid;
 	}
@@ -74,14 +69,6 @@ public class LineUp {
 			if (id == null || id < 1) {
 				return true;
 			}
-		}
-		return false;
-	}
-	
-	@Override
-	public boolean equals(Object lineUp) {
-		if (lineUp instanceof LineUp) {
-			return getLineUpString().equals(((LineUp) lineUp).getLineUpString());
 		}
 		return false;
 	}

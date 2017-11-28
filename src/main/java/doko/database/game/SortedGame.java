@@ -1,19 +1,22 @@
 package doko.database.game;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import doko.LineUp;
+import doko.lineup.LineUp;
 
 public class SortedGame {
 	
 	private LineUp lineUp;
 	private List<String> scores;
 	private boolean valid;
+	private Date date;
 
 	public SortedGame(Game game) {
 		lineUp = game.getLineUp();
 		valid = lineUp.isValid();
+		date = game.getDate();
 		scores = new ArrayList<>();
 		
 		for (int i = 0; i < lineUp.size(); i++) {
@@ -37,5 +40,16 @@ public class SortedGame {
 
 	public boolean isValid() {
 		return valid;
+	}
+	
+	public Date getDate() {
+		return date;
+	}
+	
+	public List<String> getScoresWithDate() {
+		List<String> scoresWithDate = new ArrayList<>();
+		scoresWithDate.addAll(scores);
+		scoresWithDate.add(date.toString());
+		return scoresWithDate;
 	}
 }

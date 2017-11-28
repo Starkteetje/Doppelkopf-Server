@@ -2,15 +2,9 @@ package doko.velocity;
 
 import org.apache.velocity.VelocityContext;
 
-public class VelocityReturn {//TODO bad name
+import doko.lineup.NamedLineUp;
 
-	public String getTestHtml() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/test.vm");
-	    VelocityContext context = new VelocityContext();
-	    context.put("username_placeholder", "World");
-
-	    return ve.mergeTemplate(context);
-	}
+public class HtmlProvider {
 	
 	public String getCSS() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("css/style.css");
@@ -18,18 +12,19 @@ public class VelocityReturn {//TODO bad name
 	    return ve.mergeTemplate(new VelocityContext());
 	}
 	
-	public String getLoginPageHtml() {
+	public String getLoginPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String errors) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getHeader());
-		sb.append(getLoginHtml());
+		sb.append(getNavigation(topLineUps, nonTopLineUps));
+		sb.append(getLoginHtml(errors));
 		sb.append(getFooter());
 		return sb.toString();
 	}
 	
-	private String getLoginHtml() {
+	private String getLoginHtml(String errors) {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/login.vm");
 	    VelocityContext context = new VelocityContext();
-	    context.put("errors", "");
+	    context.put("errors", errors);
 
 	    return ve.mergeTemplate(context);
 	}
@@ -38,6 +33,15 @@ public class VelocityReturn {//TODO bad name
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/header.vm");
 
 	    return ve.mergeTemplate(new VelocityContext());
+	}
+	
+	private String getNavigation(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps) {
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/navigation.vm");
+	    VelocityContext context = new VelocityContext();
+	    context.put("topLineUps", topLineUps);
+	    context.put("nonTopLineUps", nonTopLineUps);
+
+	    return ve.mergeTemplate(context);
 	}
 	
 	private String getFooter() {

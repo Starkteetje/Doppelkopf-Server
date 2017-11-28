@@ -6,9 +6,10 @@ import doko.database.rules.RulesService;
 import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.database.user.UserService;
-import doko.velocity.VelocityReturn;
+import doko.lineup.LineUp;
+import doko.lineup.UnnamedLineUp;
+import doko.velocity.HtmlProvider;
 import doko.DokoException;
-import doko.LineUp;
 import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 
@@ -31,7 +32,7 @@ public class DokoRestController {
 	private RulesService rulesService;
 	private TokenService tokenService;
 	private UserService userService;
-	private VelocityReturn velocity = new VelocityReturn();
+	private HtmlProvider velocity = new HtmlProvider();
 	private ImageController imgController = new ImageController();
 	
 	@GetMapping(value = "/doko")
@@ -54,19 +55,10 @@ public class DokoRestController {
 		return new ResponseEntity<>(playerService.getAllPlayers(), HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/gameplayers")
-	public ResponseEntity<List<String>> getGamePlayers() {
-		List<SortedGame> games = gameService.getValidGames();
-		List<List<String>> names = games.stream().map(playerService::getPlayerNames).collect(Collectors.toList());
-		List<String> argh = names.stream().map(List::toString).collect(Collectors.toList());
-		
-		return new ResponseEntity<>(argh, HttpStatus.OK);
-	}
-	
 	public ResponseEntity<List<List<String>>> getLineUpGames(LineUp lineUp) {
 		List<SortedGame> games = gameService.getGamesForLineUp(lineUp);
 		List<List<String>> gamesScores = games.stream()
-				.map(SortedGame::getScores)
+				.map(SortedGame::getScoresWithDate)
 				.collect(Collectors.toList());
 		List<String> names = playerService.getPlayerNames(lineUp);
 		
@@ -77,9 +69,15 @@ public class DokoRestController {
 		return new ResponseEntity<>(namesAndGames, HttpStatus.OK);
 	}
 	
+	@GetMapping(value = "/", produces = "application/json")
+	public ResponseEntity<List<List<String>>> getIndex() {
+		LineUp lineUp = new UnnamedLineUp("1,2,3,4");
+		return getLineUpGames(lineUp);
+	}
+	
 	@GetMapping(value = "/lineupgames", produces = "application/json")
 	public ResponseEntity<List<List<String>>> getLineUpGames(@RequestParam(value = "lineup", defaultValue = "1,2,3,4") String lineUpString) {
-		LineUp lineUp = new LineUp(lineUpString);
+		LineUp lineUp = new UnnamedLineUp(lineUpString);
 		return getLineUpGames(lineUp);
 	}
 	
@@ -92,14 +90,12 @@ public class DokoRestController {
 		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); //TODO return error page
 	}
 	
-	@GetMapping(value = "/velocity")
-	public ResponseEntity<String> getHtml() {
-		return new ResponseEntity<>(velocity.getTestHtml(), HttpStatus.OK);
-	}
-	
 	@GetMapping(value = "/login", produces = "text/html")
 	public ResponseEntity<String> getLoginPage() {
-		return new ResponseEntity<>(velocity.getLoginPageHtml(), HttpStatus.OK);
+		LineUp[] topLineUps = gameService.getTopLineUps();
+		LineUp[] nonTopLineUps = gameService.getNonTopLineUps();
+		String error = ""; //TODO
+		return new ResponseEntity<>(velocity.getLoginPageHtml(playerService.getNamedLineUps(topLineUps), playerService.getNamedLineUps(nonTopLineUps), error), HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/style", produces = "text/css")
