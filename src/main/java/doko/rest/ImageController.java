@@ -5,8 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ImageController {
-	
-	private String IMAGE_PATH = "src/main/resources/images/dokoblatt.png"; //TODO change to target
+
+	private String IMAGE_PATH = "src/main/resources/images/dokoblatt.png"; // TODO change to target
 
 	public byte[] getImage(String path) {
 		try {

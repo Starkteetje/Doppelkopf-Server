@@ -12,19 +12,23 @@ import javax.persistence.Table;
 public class Player implements Comparable<Player> {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
+
 	@Column(nullable = false)
-    private String name;
-	
+	private String name;
+
 	public Player(String name) {
 		this.name = name;
 	}
-	
+
 	public Player() {
 	}
 	
+	public Long getId() {
+		return id;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -33,15 +37,15 @@ public class Player implements Comparable<Player> {
 	public int compareTo(Player otherPlayer) {
 		return Long.compare(id, otherPlayer.id);
 	}
-	
+
 	@Override
 	public boolean equals(Object otherPlayer) {
 		if (otherPlayer instanceof Player) {
-			return id == ((Player)otherPlayer).id;
+			return id == ((Player) otherPlayer).id;
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return (int) id;

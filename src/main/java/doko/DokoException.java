@@ -1,7 +1,7 @@
 package doko;
 
 public class DokoException extends Exception {
-	
+
 	public DokoException(String string) {
 		super(string);
 	}

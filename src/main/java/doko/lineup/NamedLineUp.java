@@ -4,13 +4,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class NamedLineUp extends LineUp {
-	
+
 	private Long[] ids;
 	private String lineUpString;
 	private boolean valid;
 	private String lineUpName;
 	private static int ABBREVIATED_NAME_LENGTH = 2;
-	
+
 	public NamedLineUp(LineUp lineUp, List<String> playerNames) {
 		ids = lineUp.getIds();
 		lineUpString = lineUp.getLineUpString();
@@ -20,7 +20,7 @@ public class NamedLineUp extends LineUp {
 				.collect(Collectors.toList());
 		lineUpName = String.join("", shortNames) + "-Runde";
 	}
-	
+
 	public String getLineUpName() {
 		return lineUpName;
 	}
@@ -40,7 +40,7 @@ public class NamedLineUp extends LineUp {
 	public int size() {
 		return ids.length;
 	}
-	
+
 	private static String subStringOfN(String string) {
 		if (string.length() <= ABBREVIATED_NAME_LENGTH) {
 			return string;

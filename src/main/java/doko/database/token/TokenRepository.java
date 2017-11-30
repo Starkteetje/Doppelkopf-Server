@@ -8,7 +8,7 @@ import java.util.List;
 @Transactional
 public interface TokenRepository extends CrudRepository<Token, Long> {
 
-    List<Token> findAll();
+	List<Token> findAll();
 
-    List<Token> findByIdIn(List<Long> ids);
+	List<Token> findByIdIn(List<Long> ids);
 }

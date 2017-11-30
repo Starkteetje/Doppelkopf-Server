@@ -15,39 +15,39 @@ import javax.persistence.Table;
 public class User {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
+
 	@Column(nullable = false)
-    private String username;
-	
+	private String username;
+
 	@Column(nullable = false)
-    private String password;
-	
+	private String password;
+
 	@Column(nullable = true)
-    private String email;
-	
+	private String email;
+
 	public User(String username, String password, String email) {
 		this.username = username;
 		this.password = password;
 		this.email = email;
 	}
-	
+
 	public User() {
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}
-	
+
 	public String getPassword() {
 		return password;
 	}
-	
+
 	public String getEmail() {
 		return email;
 	}
-	
+
 	public Map<String, String> asMap() {
 		Map<String, String> map = new HashMap<>();
 		map.put("username", username);

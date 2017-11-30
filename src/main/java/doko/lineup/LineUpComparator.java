@@ -9,16 +9,17 @@ import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 
 public class LineUpComparator implements Comparator<LineUp> {
-	
+
 	private GameService gameService;
 
 	public LineUpComparator(GameService gameService) {
 		this.gameService = gameService;
 	}
 
-	//Sort lineups by number of games, or if equal, latest play date (both descending)
+	// Sort lineups by number of games, or if equal, latest play date (both
+	// descending)
 	public int compare(LineUp l1, LineUp l2) {
-		return - compareAscending(l1, l2);
+		return -compareAscending(l1, l2);
 	}
 
 	public int compareAscending(LineUp l1, LineUp l2) {

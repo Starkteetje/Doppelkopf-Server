@@ -9,21 +9,21 @@ public class UnnamedLineUpTest {
 
 	UnnamedLineUp lineUp1 = new UnnamedLineUp("1, 3,   7, 5,		90");
 	UnnamedLineUp lineUp2 = new UnnamedLineUp("1  ", " 3", "   7", " 5	", "		90");
-	UnnamedLineUp lineUp3 = new UnnamedLineUp(new Long(1), new Long(3), new Long(7) , new Long(5), new Long(90));
+	UnnamedLineUp lineUp3 = new UnnamedLineUp(new Long(1), new Long(3), new Long(7), new Long(5), new Long(90));
 	UnnamedLineUp lineUp4 = new UnnamedLineUp("1,3,5,7");
 	UnnamedLineUp lineUp5 = new UnnamedLineUp(new Long(1), new Long(7), new Long(5), new Long(3));
-	
+
 	UnnamedLineUp lineUp6 = new UnnamedLineUp("NaN, Infinity, -7, 99");
 	UnnamedLineUp lineUp7 = new UnnamedLineUp("ab, 1, 2, 3");
-	
+
 	UnnamedLineUp lineUp8 = new UnnamedLineUp("1,2,3,NaN");
 	UnnamedLineUp lineUp9 = new UnnamedLineUp("1,2,3,Infinity");
 	UnnamedLineUp lineUp10 = new UnnamedLineUp("1,2,3,-4");
 	UnnamedLineUp lineUp11 = new UnnamedLineUp("1,2,3,null");
 	UnnamedLineUp lineUp12 = new UnnamedLineUp("1,2,3,1");
-	
-	Long[] longs = {null, new Long(3), new Long(7)};
-	
+
+	Long[] longs = { null, new Long(3), new Long(7) };
+
 	@Test
 	public void testEquals() {
 		assertTrue(lineUp1.equals(lineUp1));
@@ -35,12 +35,12 @@ public class UnnamedLineUpTest {
 		assertTrue(lineUp3.equals(lineUp1));
 		assertTrue(lineUp3.equals(lineUp2));
 		assertTrue(lineUp3.equals(lineUp3));
-		
+
 		assertTrue(lineUp4.equals(lineUp4));
 		assertTrue(lineUp4.equals(lineUp5));
 		assertTrue(lineUp5.equals(lineUp4));
 		assertTrue(lineUp5.equals(lineUp5));
-		
+
 		assertFalse(lineUp1.equals(lineUp4));
 		assertFalse(lineUp1.equals(lineUp5));
 		assertFalse(lineUp1.equals(lineUp6));
@@ -58,7 +58,7 @@ public class UnnamedLineUpTest {
 		assertFalse(lineUp5.equals(lineUp6));
 		assertFalse(lineUp5.equals(lineUp7));
 	}
-	
+
 	@Test
 	public void testValid() {
 		assertFalse(lineUp1.isValid());
@@ -75,7 +75,7 @@ public class UnnamedLineUpTest {
 		assertTrue(lineUp4.isValid());
 		assertTrue(lineUp5.isValid());
 	}
-	
+
 	@Test
 	public void testLineUpString() {
 		assertTrue(lineUp1.getLineUpString().equals("1,3,5,7,90"));

@@ -1,5 +1,8 @@
 			<h1>Login</h1>
 		<br />
+
+		$successes
+
 		$errors
 
 		<form action="login" method="post">

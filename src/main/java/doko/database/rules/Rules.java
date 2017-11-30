@@ -12,35 +12,35 @@ import javax.persistence.Table;
 public class Rules {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
-	
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
+
 	@Column(nullable = false)
-    private String lineup;
-	
+	private String lineup;
+
 	@Column(nullable = false)
-    private Double version;
-	
+	private Double version;
+
 	@Column(nullable = false)
-    private String rules;
-	
+	private String rules;
+
 	public Rules(String lineup, Double version, String rules) {
 		this.lineup = lineup;
 		this.version = version;
 		this.rules = rules;
 	}
-	
+
 	public Rules() {
 	}
-	
+
 	public String getLineUpString() {
 		return lineup;
 	}
-	
+
 	public Double getVersion() {
 		return version;
 	}
-	
+
 	public String getRules() {
 		return rules;
 	}

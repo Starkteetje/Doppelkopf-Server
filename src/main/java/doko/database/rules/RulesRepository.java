@@ -8,7 +8,7 @@ import java.util.List;
 @Transactional
 public interface RulesRepository extends CrudRepository<Rules, Long> {
 
-    List<Rules> findAll();
+	List<Rules> findAll();
 
-    List<Rules> findByIdIn(List<Long> ids);
+	List<Rules> findByIdIn(List<Long> ids);
 }

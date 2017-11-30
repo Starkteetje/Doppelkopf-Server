@@ -7,7 +7,7 @@ import java.util.List;
 import doko.lineup.LineUp;
 
 public class SortedGame {
-	
+
 	private LineUp lineUp;
 	private List<String> scores;
 	private boolean valid;
@@ -18,7 +18,7 @@ public class SortedGame {
 		valid = lineUp.isValid();
 		date = game.getDate();
 		scores = new ArrayList<>();
-		
+
 		for (int i = 0; i < lineUp.size(); i++) {
 			Long score = game.getScoreOf(lineUp.getIds()[i]);
 			if (score == null) {
@@ -41,11 +41,11 @@ public class SortedGame {
 	public boolean isValid() {
 		return valid;
 	}
-	
+
 	public Date getDate() {
 		return date;
 	}
-	
+
 	public List<String> getScoresWithDate() {
 		List<String> scoresWithDate = new ArrayList<>();
 		scoresWithDate.addAll(scores);

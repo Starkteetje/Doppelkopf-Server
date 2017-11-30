@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 public class RulesService {
 
 	private RulesRepository rulesRepository;
-	
+
 	public List<Rules> getAllRules() {
 		return rulesRepository.findAll();
 	}
