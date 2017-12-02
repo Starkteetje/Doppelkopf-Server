@@ -12,7 +12,7 @@ public class HtmlProvider {
 	public String getCSS() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("css/style.css");
 
-		return ve.mergeTemplate(new VelocityContext());
+		return ve.getFilledTemplate(new VelocityContext());
 	}
 
 	public String getLoginPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String errors,
@@ -27,13 +27,13 @@ public class HtmlProvider {
 		context.put("errors", errors);
 		context.put("successes", successes);
 
-		return ve.mergeTemplate(context);
+		return ve.getFilledTemplate(context);
 	}
 
 	private String getHeader() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/header.vm");
 
-		return ve.mergeTemplate(new VelocityContext());
+		return ve.getFilledTemplate(new VelocityContext());
 	}
 
 	private String getNavigation(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps) {
@@ -42,31 +42,13 @@ public class HtmlProvider {
 		context.put("topLineUps", topLineUps);
 		context.put("nonTopLineUps", nonTopLineUps);
 
-		return ve.mergeTemplate(context);
+		return ve.getFilledTemplate(context);
 	}
 
 	private String getFooter() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/footer.vm");
 
-		return ve.mergeTemplate(new VelocityContext());
-	}
-
-	public String getDatepickerCSS() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("css/datepicker-ui.css");
-
-		return ve.mergeTemplate(new VelocityContext());
-	}
-
-	public String getJS1() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("js/datepicker1.js");
-
-		return ve.mergeTemplate(new VelocityContext());
-	}
-
-	public String getJS2() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("js/datepicker2.js");
-
-		return ve.mergeTemplate(new VelocityContext());
+		return ve.getFilledTemplate(new VelocityContext());
 	}
 
 	public String getReportingPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String errors,
@@ -82,7 +64,7 @@ public class HtmlProvider {
 		context.put("errors", errors);
 		context.put("successes", successes);
 
-		return ve.mergeTemplate(context);
+		return ve.getFilledTemplate(context);
 	}
 
 	private String getPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String mainHtml) {

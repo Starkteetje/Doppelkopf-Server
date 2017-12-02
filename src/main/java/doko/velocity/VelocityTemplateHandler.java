@@ -20,7 +20,7 @@ public class VelocityTemplateHandler {
 		this.template = ve.getTemplate(template);
 	}
 
-	public String mergeTemplate(VelocityContext context) {// TODO change name
+	public String getFilledTemplate(VelocityContext context) {
 		StringWriter writer = new StringWriter();
 		template.merge(context, writer);
 		return writer.toString();
