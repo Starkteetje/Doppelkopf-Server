@@ -9,7 +9,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "rules")
-public class Rules {
+public class Rules implements Comparable<Rules> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,5 +43,27 @@ public class Rules {
 
 	public String getRules() {
 		return rules;
+	}
+
+	@Override
+	public int compareTo(Rules otherRules) {
+		if (getLineUpString().equals(otherRules.getLineUpString())) {
+			return version.compareTo(otherRules.getVersion());
+		}
+		return getLineUpString().compareTo(otherRules.getLineUpString());
+	}
+
+	@Override
+	public boolean equals(Object otherRules) {
+		if (otherRules instanceof Rules) {
+			return this.compareTo((Rules) otherRules) == 0;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		String string = getLineUpString() + getVersion().toString();
+		return string.hashCode();
 	}
 }

@@ -4,21 +4,36 @@ import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 
+import doko.database.game.GameService;
 import doko.database.player.Player;
+import doko.database.player.PlayerService;
+import doko.database.token.TokenService;
 import doko.lineup.NamedLineUp;
 
 public class HtmlProvider {
 
-	public String getCSS() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("css/style.css");
+	private GameService gameService;
+	private PlayerService playerService;
+	private TokenService tokenService;
 
-		return ve.getFilledTemplate(new VelocityContext());
+	public HtmlProvider(GameService gameService, PlayerService playerService, TokenService tokenService) {
+		this.gameService = gameService;
+		this.playerService = playerService;
+		this.tokenService = tokenService;
 	}
 
-	public String getLoginPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String errors,
-			String successes) {
+	private String getPageHtml(boolean isLoggedIn, String mainHtml) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getHeader());
+		sb.append(getNavigation(isLoggedIn));
+		sb.append(mainHtml);
+		sb.append(getFooter());
+		return sb.toString();
+	}
+
+	public String getLoginPageHtml(boolean isLoggedIn, String errors, String successes) {
 		String loginHtml = getLoginHtml(errors, successes);
-		return getPageHtml(topLineUps, nonTopLineUps, loginHtml);
+		return getPageHtml(isLoggedIn, loginHtml);
 	}
 
 	private String getLoginHtml(String errors, String successes) {
@@ -30,31 +45,9 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	private String getHeader() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/header.vm");
-
-		return ve.getFilledTemplate(new VelocityContext());
-	}
-
-	private String getNavigation(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps) {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/navigation.vm");
-		VelocityContext context = new VelocityContext();
-		context.put("topLineUps", topLineUps);
-		context.put("nonTopLineUps", nonTopLineUps);
-
-		return ve.getFilledTemplate(context);
-	}
-
-	private String getFooter() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/footer.vm");
-
-		return ve.getFilledTemplate(new VelocityContext());
-	}
-
-	public String getReportingPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String errors,
-			String successes, List<Player> players) {
+	public String getReportingPageHtml(boolean isLoggedIn, String errors, String successes, List<Player> players) {
 		String reportingHtml = getReportingHtml(players, errors, successes);
-		return getPageHtml(topLineUps, nonTopLineUps, reportingHtml);
+		return getPageHtml(isLoggedIn, reportingHtml);
 	}
 
 	private String getReportingHtml(List<Player> players, String errors, String successes) {
@@ -67,12 +60,33 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	private String getPageHtml(NamedLineUp[] topLineUps, NamedLineUp[] nonTopLineUps, String mainHtml) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(getHeader());
-		sb.append(getNavigation(topLineUps, nonTopLineUps));
-		sb.append(mainHtml);
-		sb.append(getFooter());
-		return sb.toString();
+	private String getHeader() {
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/header.vm");
+
+		return ve.getFilledTemplate(new VelocityContext());
+	}
+
+	private String getFooter() {
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/footer.vm");
+
+		return ve.getFilledTemplate(new VelocityContext());
+	}
+
+	private String getNavigation(boolean isLoggedIn) {
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/navigation.vm");
+		VelocityContext context = new VelocityContext();
+		context.put("topLineUps", getTopLineUps());
+		context.put("nonTopLineUps", getNonTopLineUps());
+		context.put("isLoggedIn", isLoggedIn);
+
+		return ve.getFilledTemplate(context);
+	}
+
+	private NamedLineUp[] getTopLineUps() {
+		return playerService.getNamedLineUps(gameService.getTopLineUps());
+	}
+
+	private NamedLineUp[] getNonTopLineUps() {
+		return playerService.getNamedLineUps(gameService.getNonTopLineUps());
 	}
 }

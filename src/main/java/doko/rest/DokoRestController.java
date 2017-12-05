@@ -2,24 +2,25 @@ package doko.rest;
 
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
+import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
 import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.database.user.UserService;
 import doko.lineup.LineUp;
-import doko.lineup.NamedLineUp;
 import doko.lineup.UnnamedLineUp;
 import doko.velocity.HtmlProvider;
-import doko.DokoException;
-import doko.database.game.Game;
+import doko.DokoConstants;
 import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +35,18 @@ public class DokoRestController {
 	private RulesService rulesService;
 	private TokenService tokenService;
 	private UserService userService;
-	private HtmlProvider velocity = new HtmlProvider();
+
+	public DokoRestController() {
+	}
+
+	public DokoRestController(GameService gameService, PlayerService playerService, RulesService rulesService,
+			TokenService tokenService, UserService userService) {
+		this.gameService = gameService;
+		this.playerService = playerService;
+		this.rulesService = rulesService;
+		this.tokenService = tokenService;
+		this.userService = userService;
+	}
 
 	@GetMapping(value = "/games")
 	public ResponseEntity<List<SortedGame>> getGames() {
@@ -75,60 +87,50 @@ public class DokoRestController {
 
 	@GetMapping(value = "/user", produces = "application/json")
 	public ResponseEntity<Map<String, String>> getUser(@RequestParam(value = "id") String idString,
-			@RequestHeader(value = "token", defaultValue = "") String token) throws DokoException {
+			@RequestHeader(value = "token", defaultValue = "") String token) {
 		if (tokenService.isTokenValid(token)) {
-			User user = userService.getUser(idString);
-			return new ResponseEntity<>(user.asMap(), HttpStatus.OK);
+			Optional<User> user = userService.getUser(idString);
+			if (user.isPresent()) {
+				return new ResponseEntity<>(user.get().asMap(), HttpStatus.OK);
+			}
 		}
-		return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // TODO return error page
+		return ErrorPageController.getUnauthorizedPage();
 	}
 
 	@GetMapping(value = "/login", produces = "text/html")
-	public ResponseEntity<String> getLoginPage() {
-		NamedLineUp[] topLineUps = playerService.getNamedLineUps(gameService.getTopLineUps());
-		NamedLineUp[] nonTopLineUps = playerService.getNamedLineUps(gameService.getNonTopLineUps());
+	public ResponseEntity<String> getLoginPage(HttpServletRequest request) {
+		boolean isLoggedIn = isUserLoggedIn(request);
 		String errors = ""; // TODO
 		String successes = ""; // TODO
-		return new ResponseEntity<>(velocity.getLoginPageHtml(topLineUps, nonTopLineUps, errors, successes),
+
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
+		return new ResponseEntity<>(velocity.getLoginPageHtml(isLoggedIn, errors, successes),
 				HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/report", produces = "text/html")
-	public ResponseEntity<String> getReportingPage() {
-		NamedLineUp[] topLineUps = playerService.getNamedLineUps(gameService.getTopLineUps());
-		NamedLineUp[] nonTopLineUps = playerService.getNamedLineUps(gameService.getNonTopLineUps());
+	public ResponseEntity<String> getReportingPage(HttpServletRequest request) {
+		boolean isLoggedIn = isUserLoggedIn(request);
 		String errors = ""; // TODO
 		String successes = ""; // TODO
 		List<Player> players = playerService.getAllPlayers();
+
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
 		return new ResponseEntity<>(
-				velocity.getReportingPageHtml(topLineUps, nonTopLineUps, errors, successes, players), HttpStatus.OK);
+				velocity.getReportingPageHtml(isLoggedIn, errors, successes, players), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "post", method = RequestMethod.POST)
-	public ResponseEntity<String> testPost(@RequestParam(value = "id") String id) {
-
-		return new ResponseEntity<>(id, HttpStatus.OK); // TODO return error page
-	}
-
-	@RequestMapping(value = "report", method = RequestMethod.POST)
-	public ResponseEntity<List<List<String>>> reportNewGame(@RequestParam(value = "id1") String id1,
-			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
-			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
-			@RequestParam(value = "score2") String score2, @RequestParam(value = "score3") String score3,
-			@RequestParam(value = "score4") String score4, @RequestParam(value = "token") String token) {
-		Long submitterId = tokenService.getUserIdOfToken(token);
-		if (submitterId == null) {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED); // TODO return error page
-		} else {
-			Calendar calender = Calendar.getInstance();
-			if (calender.get(Calendar.HOUR) < 12) {
-				calender.add(Calendar.DAY_OF_YEAR, -1);
-			}
-			Game game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, calender.getTime());
-			gameService.insertGame(game);
-			LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
-			return getLineUpGames(lineUp);
+	public ResponseEntity<String> getRules(LineUp lineUp) {
+		Optional<Rules> rules = rulesService.getRulesOfLineUp(lineUp);
+		if (rules.isPresent()) {
+			return new ResponseEntity<>(rules.get().getRules(), HttpStatus.OK);
 		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	private boolean isUserLoggedIn(HttpServletRequest request) {
+		Object loginStatus = request.getSession().getAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
+		return loginStatus != null && ((String) loginStatus).equals("true");
 	}
 
 	@Autowired

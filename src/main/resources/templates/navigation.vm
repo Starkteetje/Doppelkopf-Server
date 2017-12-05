@@ -13,11 +13,11 @@
   #end
   </ul></div></li>
   
-  #if ($user.isLoggedIn())
-  	<li class="right"><a href="report.php">Neue Ergebnisse eintragen</a></li>
+  #if ($isLoggedIn)
+  	<li class="right"><a href="report">Neue Ergebnisse eintragen</a></li>
   
-  	<li class="right"><a href="logout.php">Ausloggen</a></li>
-  	<li class="right"><a href="profile.php">Profil</a></li>
+  	<li class="right"><a href="logout">Ausloggen</a></li>
+  	<li class="right"><a href="profile">Profil</a></li>
   #else
   	<li class="right"><a href="login">Einloggen</a></li>
   #end

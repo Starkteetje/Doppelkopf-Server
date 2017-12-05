@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import doko.DokoConstants;
 import doko.lineup.LineUp;
 import doko.lineup.LineUpComparator;
 
@@ -15,7 +16,6 @@ import doko.lineup.LineUpComparator;
 public class GameService {
 
 	private GameRepository gameRepository;
-	private static int NUMBER_OF_TOP_LINEUPS = 5;
 
 	public List<SortedGame> getValidGames() {
 		List<Game> games = gameRepository.findAll();
@@ -55,7 +55,7 @@ public class GameService {
 		Set<LineUp> lineUps = getAllLineUps();
 		return lineUps.stream()
 				.sorted(new LineUpComparator(this))
-				.limit(NUMBER_OF_TOP_LINEUPS)
+				.limit(DokoConstants.NUMBER_OF_TOP_LINEUPS)
 				.toArray(LineUp[]::new);
 	}
 

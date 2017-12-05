@@ -1,9 +1,12 @@
 package doko.database.token;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import doko.database.user.User;
 
 @Service
 public class TokenService {
@@ -25,6 +28,10 @@ public class TokenService {
 				.orElse(null);
 
 		return tokenOrNull == null ? null : tokenOrNull.getUserId();
+	}
+
+	public Token generateNewToken(User user) {
+		return new Token(700L, "sdfsad", new Date());//TODO
 	}
 
 	@Autowired
