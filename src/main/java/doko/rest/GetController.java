@@ -14,13 +14,16 @@ import doko.DokoConstants;
 import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,7 +31,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-public class DokoRestController {
+public class GetController {
 
 	private GameService gameService;
 	private PlayerService playerService;
@@ -36,10 +39,10 @@ public class DokoRestController {
 	private TokenService tokenService;
 	private UserService userService;
 
-	public DokoRestController() {
+	public GetController() {
 	}
 
-	public DokoRestController(GameService gameService, PlayerService playerService, RulesService rulesService,
+	public GetController(GameService gameService, PlayerService playerService, RulesService rulesService,
 			TokenService tokenService, UserService userService) {
 		this.gameService = gameService;
 		this.playerService = playerService;
@@ -126,6 +129,22 @@ public class DokoRestController {
 			return new ResponseEntity<>(rules.get().getRules(), HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	}
+
+	@RequestMapping(value = "logout", method = RequestMethod.GET)
+	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
+		request.getSession().removeAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
+		Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
+		rememberCookie.setMaxAge(0); // Delete Cookie
+		response.addCookie(rememberCookie);
+
+		try {
+			response.sendRedirect("/");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	private boolean isUserLoggedIn(HttpServletRequest request) {

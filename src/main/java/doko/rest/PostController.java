@@ -35,14 +35,14 @@ import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
 
 @RestController
-public class PostHandler {
+public class PostController {
 
 	private GameService gameService;
 	private PlayerService playerService;
 	private RulesService rulesService;
 	private TokenService tokenService;
 	private UserService userService;
-	private DokoRestController getController = new DokoRestController(gameService, playerService, rulesService, tokenService, userService);
+	private GetController getController = new GetController(gameService, playerService, rulesService, tokenService, userService);
 
 	private LineUp lineUp = new UnnamedLineUp(1L,2L,3L,4L);
 
