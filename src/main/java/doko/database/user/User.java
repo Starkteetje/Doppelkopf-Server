@@ -36,6 +36,10 @@ public class User {
 	public User() {
 	}
 
+	public Long getId() {
+		return id;
+	}
+
 	public String getUsername() {
 		return username;
 	}
@@ -48,7 +52,7 @@ public class User {
 		return email;
 	}
 
-	public Map<String, String> asMap() {
+	public Map<String, String> asMap() {//TODO needed?
 		Map<String, String> map = new HashMap<>();
 		map.put("username", username);
 		map.put("password", password);

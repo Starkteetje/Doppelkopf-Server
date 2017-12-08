@@ -15,6 +15,7 @@ import doko.database.player.PlayerService;
 import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
 import doko.database.token.TokenService;
+import doko.database.user.User;
 import doko.database.user.UserService;
 import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
@@ -35,6 +36,15 @@ public class RequestController {
 	public boolean isUserLoggedIn(HttpServletRequest request) {
 		Object loginStatus = request.getSession().getAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
 		return loginStatus != null && ((String) loginStatus).equals("true");
+	}
+
+	public Optional<User> getLoggedInUser(HttpServletRequest request) {
+		Object userId = request.getSession().getAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
+		try {
+			return userService.getUser((Long) userId);
+		} catch (Exception e) {
+			return Optional.ofNullable(null);
+		}
 	}
 
 	public List<List<String>> getLineUpGames(LineUp lineUp) {

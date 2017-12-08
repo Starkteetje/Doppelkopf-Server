@@ -1,0 +1,53 @@
+<h1>Hinterlegte Daten</h1>
+<br />
+
+$successes
+
+$errors
+
+Username : $username
+<br />
+Passwort : ******
+<br />
+E-Mail-Adresse : 
+	#if ($mail)
+		$mail
+	#else
+		Es ist keine E-Mail-Adresse gespeichert.
+	#end
+<br />
+
+<h2>Aktuelle Sitzungen</h2>
+<form action="profile" method="post">
+<input type="submit" name="reset" value="Alle Logins wiederrufen" />
+</form>
+
+<h2>Passwort ändern</h2>
+<form action="changepw" method="post">
+	<table class="noborder">
+		<tr class="noborder">
+			<td class="pw">Altes Passwort</td>
+			<td class="noborder">
+				<input type="password" name="oldpw" placeholder="******">
+			</td>
+		</tr>
+		<tr class="noborder">
+			<td class="pw">Neues Passwort</td>
+			<td class="noborder">
+				<input type="password" name="newpw" placeholder="Neues Passwort">
+			</td>
+		</tr>
+		<tr class="noborder">
+			<td class="pw">Neues Passwort wiederholen</td>
+			<td class="noborder">
+				<input type="password" name="newpw2" placeholder="Neues Passwort">
+			</td>
+		</tr>
+		<tr class="noborder">
+			<td class="pw"></td>
+			<td class="noborder">
+				<input type="submit" value="Passwort ändern">
+			</td>
+		</tr>
+	</table>
+</form>

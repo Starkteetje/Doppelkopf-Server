@@ -15,4 +15,8 @@ public abstract class ErrorPageController {
 		return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // TODO return error page
 		//return ResponseEntity.badRequest().build();
 	}
+
+	public static <T> ResponseEntity<T> getServerErrorPage() {
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // TODO return error page
+	}
 }

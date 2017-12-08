@@ -30,6 +30,23 @@ public class TokenService {
 		return tokenOrNull == null ? null : tokenOrNull.getUserId();
 	}
 
+	public List<Token> getTokensOfUser(Long id) {
+		return tokenRepository.findByUserId(id);
+	}
+
+	public boolean deleteTokens(List<Token> tokens) {
+		try {
+			tokenRepository.delete(tokens);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+	}
+
+	public boolean deleteTokensOfUser(Long id) {
+		return deleteTokens(getTokensOfUser(id));
+	}
+
 	public Token generateNewToken(User user) {
 		return new Token(700L, "sdfsad", new Date());//TODO
 	}

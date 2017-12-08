@@ -39,10 +39,9 @@ public class GetController extends RequestController {
 		return new ResponseEntity<>(playerService.getAllPlayers(), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/", produces = "application/json")
-	public ResponseEntity<List<List<String>>> getIndex() {
-		LineUp lineUp = new UnnamedLineUp(DokoConstants.DEFAULT_LINEUP_STRING);
-		return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
+	@GetMapping(value = "/", produces = "text/html")
+	public ResponseEntity<String> getIndex(HttpServletRequest request) {
+		return displayLineUp(request, DokoConstants.DEFAULT_LINEUP_STRING);
 	}
 
 	@GetMapping(value = "/lineupgames", produces = "application/json")
@@ -70,8 +69,8 @@ public class GetController extends RequestController {
 		String errors = ""; // TODO
 		String successes = ""; // TODO
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
-		return new ResponseEntity<>(velocity.getLoginPageHtml(isLoggedIn, errors, successes),
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService, isLoggedIn);
+		return new ResponseEntity<>(velocity.getLoginPageHtml(errors, successes),
 				HttpStatus.OK);
 	}
 
@@ -82,9 +81,9 @@ public class GetController extends RequestController {
 		String successes = ""; // TODO
 		List<Player> players = playerService.getAllPlayers();
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService, isLoggedIn);
 		return new ResponseEntity<>(
-				velocity.getReportingPageHtml(isLoggedIn, errors, successes, players), HttpStatus.OK);
+				velocity.getReportingPageHtml(errors, successes, players), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/lineup", produces = "text/html")
@@ -94,12 +93,29 @@ public class GetController extends RequestController {
 		String errors = ""; // TODO
 		String successes = ""; // TODO
 		String lineUpRules = getRules(lineUpString);
+		boolean isMoneyLineUp = lineUpString.equals(DokoConstants.DEFAULT_LINEUP_STRING); //TODO
 		List<List<String>> lineUpGames = getLineUpGames(lineUpString);
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService, isLoggedIn);
 		return new ResponseEntity<>(
-				velocity.getDisplayLineUpPageHtml(isLoggedIn, errors, successes, lineUpRules, lineUpGames), HttpStatus.OK);
+				velocity.getDisplayLineUpPageHtml(errors, successes, lineUpRules, lineUpGames, isMoneyLineUp), HttpStatus.OK);
 
+	}
+
+	@GetMapping(value = "/profile", produces = "text/html")
+	public ResponseEntity<String> getProfile(HttpServletRequest request,
+			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
+		boolean isLoggedIn = isUserLoggedIn(request);
+		String errors = ""; // TODO
+		String successes = ""; // TODO
+		Optional<User> user = getLoggedInUser(request);
+
+		if (user.isPresent()) {
+			HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService, isLoggedIn);
+			return new ResponseEntity<>(
+					velocity.getProfilePageHtml(errors, successes, user.get()), HttpStatus.OK);
+		}
+		return ErrorPageController.getUnauthorizedPage();
 	}
 
 	@RequestMapping(value = "logout", method = RequestMethod.GET)

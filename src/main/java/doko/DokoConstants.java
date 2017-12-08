@@ -10,6 +10,8 @@ public abstract class DokoConstants {
 
 	public static final String SESSION_LOGIN_STATUS_ATTRIBUTE_NAME = "login_status";
 
+	public static final String SESSION_USER_ID_ATTRIBUTE_NAME = "user_id";
+
 	public static final String DEFAULT_LINEUP_STRING = "1,2,3,4";
 
 	public static final String DATABASE_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss.S";

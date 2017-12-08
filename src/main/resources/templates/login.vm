@@ -1,35 +1,31 @@
-			<h1>Login</h1>
-		<br />
+<h1>Login</h1>
+<br />
 
-		$successes
+$successes
 
-		$errors
+$errors
 
-		<form action="login" method="post">
-			<table class="noborder" bgcolor="#006980">
-				<tr class="noborder">
-					<td class="noborder"><b>Username</b></td>
-					<td class="noborder"><input type="text" name="username" /></td>
-				</tr>
-				<tr class="noborder">
-					<td class="noborder"><b>Passwort</b></td>
-					<td class="noborder"><input type="password" name="password" /></td>
-				</tr>
-				<tr class="noborder">
-					<td class="noborder"><b>Eingeloggt bleiben*</b></td>
-					<td class="noborder"><input type="checkbox" name="remember_user" /></td>
-				</tr>
-				<tr class="noborder">
-					<td class="noborder"></td>
-					<td class="noborder"><input type="submit" value="Anmelden" /></td>
-				</tr>
-				<tr class="noborder">
-					<td class="noborder"></td>
-					<td class="noborder"><small>* this will set a cookie in your browser</small></td>
-				</tr>
-			</table>
-		</form>
-	</center>
-</body>
-
-</html>
+<form action="login" method="post">
+	<table class="noborder" bgcolor="#006980">
+		<tr class="noborder">
+			<td class="noborder"><b>Username</b></td>
+			<td class="noborder"><input type="text" name="username" /></td>
+		</tr>
+		<tr class="noborder">
+			<td class="noborder"><b>Passwort</b></td>
+			<td class="noborder"><input type="password" name="password" /></td>
+		</tr>
+		<tr class="noborder">
+			<td class="noborder"><b>Eingeloggt bleiben</b></td>
+			<td class="noborder"><input type="checkbox" name="remember_user" /></td>
+		</tr>
+		<tr class="noborder">
+			<td class="noborder"></td>
+			<td class="noborder"><input type="submit" value="Anmelden*" /></td>
+		</tr>
+		<tr class="noborder">
+			<td class="noborder"></td>
+			<td class="noborder"><small>* Bei der Anmeldung wird ein Cookie im Browser gesetzt. Falls die Option "Eingeloggt bleiben" nicht verwendet wird, wird der Cookie beim Beenden des Browsers gelöscht.</small></td>
+		</tr>
+	</table>
+</form>

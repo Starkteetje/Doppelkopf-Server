@@ -28,7 +28,59 @@ import doko.lineup.UnnamedLineUp;
 @RestController
 public class PostController extends RequestController {
 
-	@RequestMapping(value = "report", method = RequestMethod.POST)
+	@RequestMapping(value = "login", method = RequestMethod.POST) //TODO does this need protection from CSRF?
+	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
+			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
+			@RequestParam(value = "remember_user", defaultValue = "false") String keepLoggedIn) {
+		Optional<User> user = userService.getUserByName(username);
+		if (!user.isPresent()) {
+			return ErrorPageController.getUnauthorizedPage();
+		}
+
+		String storedPw = user.get().getPassword();
+		Long userId = user.get().getId();
+		if (BCrypt.checkpw(password, storedPw)) {
+			Token token = tokenService.generateNewToken(user.get());
+
+			//TODO mark cookie as secure if HTTPS possible
+			if (keepLoggedIn.equals("on")) {
+				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
+				rememberCookie.setMaxAge(60 * 60 * 24 * 30); // Cookie is stored for 30 days
+				response.addCookie(rememberCookie);
+			}
+			request.getSession().setAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME, "true");
+			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, userId);
+
+			try {
+				response.sendRedirect("/");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return ErrorPageController.getUnauthorizedPage();
+	}
+
+	@RequestMapping(value = "profile", method = RequestMethod.POST) //TODO need protection from CSRF
+	public ResponseEntity<String> deleteAllLoginTokens(HttpServletRequest request, HttpServletResponse response) {
+		Optional<User> user = getLoggedInUser(request);
+		if (!user.isPresent()) {
+			return ErrorPageController.getUnauthorizedPage();
+		}
+
+		Long userId = user.get().getId();
+		boolean deleted = tokenService.deleteTokensOfUser(userId);
+		if (deleted) {
+			String success = "Die Gültigkeit aller Login-Tokens wurde widerrufen.";
+			return new ResponseEntity<>(HttpStatus.OK); //TODO
+		} else {
+			String error = "Fehler beim Löschen der Login-Token.";
+			return ErrorPageController.getServerErrorPage(); //TODO
+		}
+	}
+
+	@RequestMapping(value = "report", method = RequestMethod.POST) //TODO need protection from CSRF
 	public ResponseEntity<List<List<String>>> reportNewGame(@RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
 			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
@@ -52,37 +104,5 @@ public class PostController extends RequestController {
 			LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
 			return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
 		}
-	}
-
-	@RequestMapping(value = "login", method = RequestMethod.POST)
-	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
-			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
-			@RequestParam(value = "remember_user", defaultValue = "false") String keepLoggedIn) {
-		Optional<User> user = userService.getUserByName(username);
-		if (!user.isPresent()) {
-			return ErrorPageController.getUnauthorizedPage();
-		}
-
-		String storedPw = user.get().getPassword();
-		if (BCrypt.checkpw(password, storedPw)) {
-			Token token = tokenService.generateNewToken(user.get());
-
-			//TODO mark cookie as secure if HTTPS possible
-			if (keepLoggedIn.equals("on")) {
-				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
-				rememberCookie.setMaxAge(60 * 60 * 24 * 30); // Cookie is stored for 30 days
-				response.addCookie(rememberCookie);
-			}
-			request.getSession().setAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME, "true");
-
-			try {
-				response.sendRedirect("/");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return new ResponseEntity<>(HttpStatus.OK);
-		}
-		return ErrorPageController.getUnauthorizedPage();
 	}
 }
