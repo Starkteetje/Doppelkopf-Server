@@ -1,55 +1,33 @@
 package doko.rest;
 
-import doko.database.player.Player;
-import doko.database.player.PlayerService;
-import doko.database.rules.Rules;
-import doko.database.rules.RulesService;
-import doko.database.token.TokenService;
-import doko.database.user.User;
-import doko.database.user.UserService;
-import doko.lineup.LineUp;
-import doko.lineup.UnnamedLineUp;
-import doko.velocity.HtmlProvider;
-import doko.DokoConstants;
-import doko.database.game.GameService;
-import doko.database.game.SortedGame;
-
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import doko.DokoConstants;
+import doko.database.game.SortedGame;
+import doko.database.player.Player;
+import doko.database.user.User;
+import doko.lineup.LineUp;
+import doko.lineup.UnnamedLineUp;
+import doko.velocity.HtmlProvider;
 
 @RestController
-public class GetController {
-
-	private GameService gameService;
-	private PlayerService playerService;
-	private RulesService rulesService;
-	private TokenService tokenService;
-	private UserService userService;
-
-	public GetController() {
-	}
-
-	public GetController(GameService gameService, PlayerService playerService, RulesService rulesService,
-			TokenService tokenService, UserService userService) {
-		this.gameService = gameService;
-		this.playerService = playerService;
-		this.rulesService = rulesService;
-		this.tokenService = tokenService;
-		this.userService = userService;
-	}
+public class GetController extends RequestController {
 
 	@GetMapping(value = "/games")
 	public ResponseEntity<List<SortedGame>> getGames() {
@@ -61,31 +39,17 @@ public class GetController {
 		return new ResponseEntity<>(playerService.getAllPlayers(), HttpStatus.OK);
 	}
 
-	public ResponseEntity<List<List<String>>> getLineUpGames(LineUp lineUp) {
-		List<SortedGame> games = gameService.getGamesForLineUp(lineUp);
-		List<List<String>> gamesScores = games.stream()
-				.map(SortedGame::getScoresWithDate)
-				.collect(Collectors.toList());
-		List<String> names = playerService.getPlayerNames(lineUp);
-
-		List<List<String>> namesAndGames = new ArrayList<>();
-		namesAndGames.add(names);
-		namesAndGames.addAll(gamesScores);
-
-		return new ResponseEntity<>(namesAndGames, HttpStatus.OK);
-	}
-
 	@GetMapping(value = "/", produces = "application/json")
 	public ResponseEntity<List<List<String>>> getIndex() {
-		LineUp lineUp = new UnnamedLineUp("1,2,3,4");
-		return getLineUpGames(lineUp);
+		LineUp lineUp = new UnnamedLineUp(DokoConstants.DEFAULT_LINEUP_STRING);
+		return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/lineupgames", produces = "application/json")
-	public ResponseEntity<List<List<String>>> getLineUpGames(
-			@RequestParam(value = "lineup", defaultValue = "1,2,3,4") String lineUpString) {
+	public ResponseEntity<List<List<String>>> getLineUpGamesAsJSON(
+			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
 		LineUp lineUp = new UnnamedLineUp(lineUpString);
-		return getLineUpGames(lineUp);
+		return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/user", produces = "application/json")
@@ -123,12 +87,19 @@ public class GetController {
 				velocity.getReportingPageHtml(isLoggedIn, errors, successes, players), HttpStatus.OK);
 	}
 
-	public ResponseEntity<String> getRules(LineUp lineUp) {
-		Optional<Rules> rules = rulesService.getRulesOfLineUp(lineUp);
-		if (rules.isPresent()) {
-			return new ResponseEntity<>(rules.get().getRules(), HttpStatus.OK);
-		}
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+	@GetMapping(value = "/lineup", produces = "text/html")
+	public ResponseEntity<String> displayLineUp(HttpServletRequest request,
+			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
+		boolean isLoggedIn = isUserLoggedIn(request);
+		String errors = ""; // TODO
+		String successes = ""; // TODO
+		String lineUpRules = getRules(lineUpString);
+		List<List<String>> lineUpGames = getLineUpGames(lineUpString);
+
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService);
+		return new ResponseEntity<>(
+				velocity.getDisplayLineUpPageHtml(isLoggedIn, errors, successes, lineUpRules, lineUpGames), HttpStatus.OK);
+
 	}
 
 	@RequestMapping(value = "logout", method = RequestMethod.GET)
@@ -145,35 +116,5 @@ public class GetController {
 			e.printStackTrace();
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	private boolean isUserLoggedIn(HttpServletRequest request) {
-		Object loginStatus = request.getSession().getAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
-		return loginStatus != null && ((String) loginStatus).equals("true");
-	}
-
-	@Autowired
-	public void setGameService(GameService gameService) {
-		this.gameService = gameService;
-	}
-
-	@Autowired
-	public void setPlayerService(PlayerService playerService) {
-		this.playerService = playerService;
-	}
-
-	@Autowired
-	public void setRulesService(RulesService rulesService) {
-		this.rulesService = rulesService;
-	}
-
-	@Autowired
-	public void setTokenService(TokenService tokenService) {
-		this.tokenService = tokenService;
-	}
-
-	@Autowired
-	public void setUserService(UserService userService) {
-		this.userService = userService;
 	}
 }

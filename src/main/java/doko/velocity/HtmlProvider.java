@@ -1,9 +1,12 @@
 package doko.velocity;
 
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.velocity.VelocityContext;
 
+import doko.DokoConstants;
 import doko.database.game.GameService;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
@@ -56,6 +59,33 @@ public class HtmlProvider {
 		context.put("players", players);
 		context.put("errors", errors);
 		context.put("successes", successes);
+
+		return ve.getFilledTemplate(context);
+	}
+
+	public String getDisplayLineUpPageHtml(boolean isLoggedIn, String errors, String successes, String lineUpRules, List<List<String>> lineUpGames) {
+		String displayHtml = getDisplayHtml(lineUpGames, false, lineUpRules, errors, successes);//TODO
+		return getPageHtml(isLoggedIn, displayHtml);
+	}
+
+	private String getDisplayHtml(List<List<String>> lineUpGames, boolean isMoneyLineUp, String lineUpRules, String errors, String successes) {
+		VelocityTemplateHandler ve;
+		if (isMoneyLineUp) {
+			ve = new VelocityTemplateHandler("templates/displayMoney.vm");
+		} else {
+			ve = new VelocityTemplateHandler("templates/displayCasual.vm");
+		}
+		VelocityContext context = new VelocityContext();
+		context.put("games", lineUpGames);
+		context.put("isMoney", isMoneyLineUp);
+		context.put("rules", lineUpRules);
+		context.put("errors", errors);
+		context.put("successes", successes);
+		context.put(Double.class.getSimpleName(), Double.class);
+		context.put("integerFormatter", new DecimalFormat("#"));
+		context.put("doubleFormatter", new DecimalFormat("#.##"));
+		context.put("dateParser", new SimpleDateFormat(DokoConstants.DATABASE_DATE_FORMAT));
+		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
 
 		return ve.getFilledTemplate(context);
 	}

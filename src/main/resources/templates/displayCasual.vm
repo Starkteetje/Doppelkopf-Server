@@ -1,0 +1,54 @@
+<h1>Ergebnisse</h1>
+
+$successes
+
+$errors
+
+#if ($games.size() > 0)
+	#set ($players = $games.remove(0))
+	<table class="results">
+		<tr class="bigborder">
+			<td class="tablehead">Spieler</td>
+			#set ($scores = [])
+			#set ($indexOfLastPlayer = $players.size() - 1)
+			#foreach ($i in [0..$indexOfLastPlayer])
+				<td class="tablehead"> $players.get($i) </td>
+				#set ($add = $scores.add(0)) #*//disable output true*#
+			#end
+		</tr>
+
+		#set ($numberOfGames = 0)
+		#foreach ($game in $games)
+			#set ($numberOfGames = $numberOfGames + 1)
+			<tr>
+				<td>$dateFormatter.format($dateParser.parse($game.get(4)))</td>
+				#foreach ($i in [0..$indexOfLastPlayer])
+					#set ($score = $Double.parseDouble($game.get($i)))
+					#set ($scores[$i] = $scores[$i] + $score)
+					<td>$integerFormatter.format($score)</td>
+				#end
+			</tr>
+		#end
+
+		<tr class="bigborder">
+			<td>Gesamtpunktzahl</td>
+			#foreach ($score in $scores)
+				<td> $integerFormatter.format($score) </td>
+			#end
+		</tr>
+
+		<tr class="bigborder">
+			<td>Durchschnitt</td>
+			#foreach ($score in $scores)
+				#set ($average = $score / $numberOfGames)
+				<td> $doubleFormatter.format($average) </td>
+			#end
+		</tr>
+	</table>
+#end
+
+#if ($rules != "")
+	<br />
+	<h1>Regeln</h1>
+	$rules
+#end

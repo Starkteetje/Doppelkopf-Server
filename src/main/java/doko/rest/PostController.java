@@ -2,17 +2,14 @@ package doko.rest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -23,28 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
 import doko.database.game.Game;
-import doko.database.game.GameService;
-import doko.database.game.SortedGame;
-import doko.database.player.PlayerService;
-import doko.database.rules.RulesService;
 import doko.database.token.Token;
-import doko.database.token.TokenService;
 import doko.database.user.User;
-import doko.database.user.UserService;
 import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
 
 @RestController
-public class PostController {
-
-	private GameService gameService;
-	private PlayerService playerService;
-	private RulesService rulesService;
-	private TokenService tokenService;
-	private UserService userService;
-	private GetController getController = new GetController(gameService, playerService, rulesService, tokenService, userService);
-
-	private LineUp lineUp = new UnnamedLineUp(1L,2L,3L,4L);
+public class PostController extends RequestController {
 
 	@RequestMapping(value = "report", method = RequestMethod.POST)
 	public ResponseEntity<List<List<String>>> reportNewGame(@RequestParam(value = "id1") String id1,
@@ -68,7 +50,7 @@ public class PostController {
 			}
 			gameService.insertGame(game);
 			LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
-			return getLineUpGames(lineUp);
+			return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
 		}
 	}
 
@@ -85,7 +67,6 @@ public class PostController {
 		if (BCrypt.checkpw(password, storedPw)) {
 			Token token = tokenService.generateNewToken(user.get());
 
-			
 			//TODO mark cookie as secure if HTTPS possible
 			if (keepLoggedIn.equals("on")) {
 				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
@@ -103,44 +84,5 @@ public class PostController {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
-	}
-
-	public ResponseEntity<List<List<String>>> getLineUpGames(LineUp lineUp) {//TODO duplicate code
-		List<SortedGame> games = gameService.getGamesForLineUp(lineUp);
-		List<List<String>> gamesScores = games.stream()
-				.map(SortedGame::getScoresWithDate)
-				.collect(Collectors.toList());
-		List<String> names = playerService.getPlayerNames(lineUp);
-
-		List<List<String>> namesAndGames = new ArrayList<>();
-		namesAndGames.add(names);
-		namesAndGames.addAll(gamesScores);
-
-		return new ResponseEntity<>(namesAndGames, HttpStatus.OK);
-	}
-
-	@Autowired
-	public void setGameService(GameService gameService) {
-		this.gameService = gameService;
-	}
-
-	@Autowired
-	public void setPlayerService(PlayerService playerService) {
-		this.playerService = playerService;
-	}
-
-	@Autowired
-	public void setRulesService(RulesService rulesService) {
-		this.rulesService = rulesService;
-	}
-
-	@Autowired
-	public void setTokenService(TokenService tokenService) {
-		this.tokenService = tokenService;
-	}
-
-	@Autowired
-	public void setUserService(UserService userService) {
-		this.userService = userService;
 	}
 }

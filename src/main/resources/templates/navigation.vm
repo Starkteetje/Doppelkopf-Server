@@ -1,14 +1,14 @@
 <ul class="navigation">
-  <li class="left"><a href="lineupgames?lineup=1,2,3,4">AMST-Runde</a></li>
+  <li class="left"><a href="lineup?lineup=1,2,3,4">AMST-Runde</a></li>
   #foreach ($lineUp in $topLineUps)
   	#if ($lineUp.getLineUpString() != "1,2,3,4")
-  		<li class="left"><a href="lineupgames?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName() </a></li>
+  		<li class="left"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName() </a></li>
   	#end
   #end
   <li class="left"><div class="dropDown">Weitere Runden<ul class="vertical">
   #foreach ($lineUp in $nonTopLineUps)
 	#if ($lineUp.getLineUpString() != "1,2,3,4")
-  		<li class=\"left\"><a href="lineupgames?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName()</a></li>
+  		<li class=\"left\"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName()</a></li>
 	#end
   #end
   </ul></div></li>

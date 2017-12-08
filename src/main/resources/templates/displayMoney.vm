@@ -1,0 +1,81 @@
+<h1>Ergebnisse</h1>
+
+$successes
+
+$errors
+
+#if ($games.size() > 0)
+	#set ($players = $games.remove(0))
+	<table class="results">
+		<tr class="bigborder">
+			<td class="tablehead">Spieler</td>
+			#set ($scores = [])
+			#set ($penalties = [])
+			#set ($indexOfLastPlayer = $players.size() - 1)
+			#foreach ($i in [0..$indexOfLastPlayer])
+				<td class="tablehead"> $players.get($i) </td>
+				#set ($add = $scores.add(0)) #*//disable output true*#
+				#set ($add = $penalties.add(0)) #*//disable output true*#
+			#end
+		</tr>
+
+		#set ($numberOfGames = 0)
+		#foreach ($game in $games)
+			#set ($numberOfGames = $numberOfGames + 1)
+			<tr>
+				<td>$dateFormatter.format($dateParser.parse($game.get(4)))</td>
+				#foreach ($i in [0..$indexOfLastPlayer])
+					#set ($score = $Double.parseDouble($game.get($i)))
+					#set ($scores[$i] = $scores[$i] + $score)
+					#if ($score >= 0)
+						#set ($penalty = 0)
+					#elseif ($score >= -14)
+						#set ($penalty = 0.5)
+					#elseif ($score >= -24)
+						#set ($penalty = 1)
+					#elseif ($score >= -34)
+						#set ($penalty = 1.5)
+					#else
+						#set ($penalty = 2)
+					#end
+					#set ($penalties[$i] = $penalties[$i] + $penalty)
+					#if ($score >= 0)
+						<td class="good">$integerFormatter.format($score)</td>
+					#elseif ($score >= -24)
+						<td class="meh">$integerFormatter.format($score)</td>
+					#else
+						<td class="bad">$integerFormatter.format($score)</td>
+					#end
+				#end
+			</tr>
+		#end
+
+		<tr class="bigborder">
+			<td>Gesamtpunktzahl</td>
+			#foreach ($score in $scores)
+				<td> $integerFormatter.format($score) </td>
+			#end
+		</tr>
+
+		<tr class="bigborder">
+			<td>Durchschnitt</td>
+			#foreach ($score in $scores)
+				#set ($average = $score / $numberOfGames)
+				<td> $doubleFormatter.format($average) </td>
+			#end
+		</tr>
+
+		<tr class="bigborder">
+			<td class=\"noborder\">Betrag</td>
+			#foreach ($penalty in $penalties)
+				<td> $doubleFormatter.format($penalty)&euro; </td>
+			#end
+		</tr>
+	</table>
+#end
+
+#if ($rules != "")
+	<br />
+	<h1>Regeln</h1>
+	$rules
+#end
