@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import doko.DokoConstants;
 import doko.database.game.GameService;
 import doko.database.game.SortedGame;
+import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
@@ -18,6 +19,7 @@ import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.database.user.UserService;
 import doko.lineup.LineUp;
+import doko.lineup.NamedLineUp;
 import doko.lineup.UnnamedLineUp;
 
 public class RequestController {
@@ -47,22 +49,27 @@ public class RequestController {
 		}
 	}
 
-	public List<List<String>> getLineUpGames(LineUp lineUp) {
-		List<SortedGame> games = gameService.getGamesForLineUp(lineUp);
-		List<List<String>> gamesScores = games.stream()
+	public List<List<Object>> getLineUpGames(LineUp lineUp) {
+		NamedLineUp namedLineUp = new NamedLineUp(lineUp, playerService);
+
+		List<Object> names = namedLineUp.getPlayers()
+				.stream()
+				.map(Player::getName)
+				.collect(Collectors.toList());
+		List<SortedGame> games = gameService.getGamesForLineUp(namedLineUp);
+		List<List<Object>> gamesScores = games.stream()
 				.map(SortedGame::getScoresWithDate)
 				.collect(Collectors.toList());
-		List<String> names = playerService.getPlayerNames(lineUp);
 
-		List<List<String>> namesAndGames = new ArrayList<>();
+		List<List<Object>> namesAndGames = new ArrayList<>();
 		namesAndGames.add(names);
 		namesAndGames.addAll(gamesScores);
 
 		return namesAndGames;
 	}
 
-	public List<List<String>> getLineUpGames(String lineUpString) {
-		UnnamedLineUp lineUp = new UnnamedLineUp(lineUpString);
+	public List<List<Object>> getLineUpGames(String lineUpString) {
+		LineUp lineUp = new UnnamedLineUp(lineUpString);
 		return getLineUpGames(lineUp);
 	}
 
@@ -75,7 +82,7 @@ public class RequestController {
 	}
 
 	public String getRules(String lineUpString) {
-		UnnamedLineUp lineUp = new UnnamedLineUp(lineUpString);
+		LineUp lineUp = new UnnamedLineUp(lineUpString);
 		return getRules(lineUp);
 	}
 }

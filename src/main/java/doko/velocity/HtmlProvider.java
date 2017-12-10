@@ -2,12 +2,17 @@ package doko.velocity;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.velocity.VelocityContext;
 
+import com.google.gson.Gson;
+
 import doko.DokoConstants;
 import doko.database.game.GameService;
+import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.token.TokenService;
@@ -66,31 +71,98 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	public String getDisplayLineUpPageHtml(String errors, String successes, String lineUpRules, List<List<String>> lineUpGames, boolean isMoneyLineUp) {
-		String displayHtml = getDisplayHtml(lineUpGames, isMoneyLineUp, lineUpRules, errors, successes);
+	public String getDisplayLineUpPageHtml(String errors, String successes, String lineUpRules, NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp) {
+		String displayHtml = getDisplayHtml(lineUp, lineUpGames, isMoneyLineUp, lineUpRules, errors, successes);
 		return getPageHtml(displayHtml);
 	}
 
-	private String getDisplayHtml(List<List<String>> lineUpGames, boolean isMoneyLineUp, String lineUpRules, String errors, String successes) {
+	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp, String lineUpRules, String errors, String successes) {
 		VelocityTemplateHandler ve;
 		if (isMoneyLineUp) {
 			ve = new VelocityTemplateHandler("templates/displayMoney.vm");
 		} else {
 			ve = new VelocityTemplateHandler("templates/displayCasual.vm");
 		}
+
+		String allSessionsJSON = getJSONForAllSessionsGraph(lineUp, lineUpGames);
+		String perSessionJSON = getJSONForPerSessionGraph(lineUp, lineUpGames);
+		String ticksJSON = getJSONForTicks(lineUpGames);
 		VelocityContext context = new VelocityContext();
+		context.put("lineUp", lineUp);
 		context.put("games", lineUpGames);
 		context.put("isMoney", isMoneyLineUp);
+		context.put("dataForAllSessions", allSessionsJSON);
+		context.put("dataPerSession", perSessionJSON);
+		context.put("ticks", ticksJSON);
 		context.put("rules", lineUpRules);
 		context.put("errors", errors);
 		context.put("successes", successes);
 		context.put(Double.class.getSimpleName(), Double.class);
-		context.put("integerFormatter", new DecimalFormat("#"));
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
-		context.put("dateParser", new SimpleDateFormat(DokoConstants.DATABASE_DATE_FORMAT));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
 
 		return ve.getFilledTemplate(context);
+	}
+
+	private String getJSONForAllSessionsGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
+		List<List<Object>> graphData = getGraphHeader(lineUp);
+
+		List<Long> previousScores = new ArrayList<>();
+		for (int i = 0; i < lineUpGames.size(); i++) {
+			List<Object> gameData = new ArrayList<>();
+			gameData.add(i + 1);
+			List<Long> scores = lineUpGames.get(i).getScores();
+
+			if (i == 0) {
+				gameData.addAll(scores);
+				previousScores = new ArrayList<>(scores);
+			} else {
+				for (int j = 0; j < scores.size(); j++) {
+					previousScores.set(j, scores.get(j) + previousScores.get(j));
+				}
+				gameData.addAll(previousScores);
+			}
+			graphData.add(gameData);
+		}
+		Gson gson = new Gson();
+		return gson.toJson(graphData);
+	}
+
+
+	private String getJSONForPerSessionGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
+		List<List<Object>> graphData = getGraphHeader(lineUp);
+
+		for (int i = 0; i < lineUpGames.size(); i++) {
+			List<Object> gameData = new ArrayList<>();
+			gameData.add(i + 1);
+			gameData.addAll(lineUpGames.get(i).getScores());
+			graphData.add(gameData);
+		}
+		Gson gson = new Gson();
+		return gson.toJson(graphData);
+	}
+
+	private String getJSONForTicks(List<SortedGame> lineUpGames) {
+		int[] ticks = new int[lineUpGames.size() - 1];
+		for (int i = 0; i < ticks.length; i++) {
+			ticks[i] = i + 1;
+		}
+
+		Gson gson = new Gson();
+		return gson.toJson(ticks);
+	}
+
+	private List<List<Object>> getGraphHeader(NamedLineUp lineUp) {
+		List<List<Object>> graphData = new ArrayList<>();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Abend");
+		legend.addAll(lineUp.getPlayers()
+				.stream()
+				.map(Player::getName)
+				.collect(Collectors.toList()));
+		graphData.add(legend);
+		return graphData;
 	}
 
 	public String getProfilePageHtml(String errors, String successes, User user) {

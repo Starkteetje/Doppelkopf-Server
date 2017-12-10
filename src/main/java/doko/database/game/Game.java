@@ -1,6 +1,8 @@
 package doko.database.game;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -8,9 +10,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-
-import doko.lineup.LineUp;
-import doko.lineup.UnnamedLineUp;
 
 @Entity
 @Table(name = "scores")
@@ -74,11 +73,26 @@ public class Game {
 	public Game() {
 	}
 
-	public LineUp getLineUp() {
-		return new UnnamedLineUp(player1, player2, player3, player4);
+	public List<Long> getPlayerIds() {
+		List<Long> ids = new ArrayList<>();
+		ids.add(player1);
+		ids.add(player2);
+		ids.add(player3);
+		ids.add(player4);
+		ids.sort(null);
+		return ids;
 	}
 
-	public Long getScoreOf(Long playerId) {
+	public List<Long> getScores() {
+		List<Long> ids = getPlayerIds();
+		List<Long> scores = new ArrayList<>();
+		for (Long playerId : ids) {
+			scores.add(getScoreOf(playerId));
+		}
+		return scores;
+	}
+
+	private Long getScoreOf(Long playerId) {
 		if (playerId.equals(player1)) {
 			return score1;
 		} else if (playerId.equals(player2)) {

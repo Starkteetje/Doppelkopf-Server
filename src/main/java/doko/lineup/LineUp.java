@@ -1,8 +1,10 @@
 package doko.lineup;
 
+import java.util.List;
+
 public abstract class LineUp {
 
-	public abstract Long[] getIds();
+	public abstract List<Long> getIds();
 
 	public abstract boolean isValid();
 

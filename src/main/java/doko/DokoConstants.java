@@ -14,7 +14,5 @@ public abstract class DokoConstants {
 
 	public static final String DEFAULT_LINEUP_STRING = "1,2,3,4";
 
-	public static final String DATABASE_DATE_FORMAT = "yyyy-MM-dd hh:mm:ss.S";
-
 	public static final String OUTPUT_DATE_FORMAT = "dd.MM.yy";
 }

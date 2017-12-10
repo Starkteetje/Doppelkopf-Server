@@ -81,7 +81,7 @@ public class PostController extends RequestController {
 	}
 
 	@RequestMapping(value = "report", method = RequestMethod.POST) //TODO need protection from CSRF
-	public ResponseEntity<List<List<String>>> reportNewGame(@RequestParam(value = "id1") String id1,
+	public ResponseEntity<List<List<Object>>> reportNewGame(@RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
 			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
 			@RequestParam(value = "score2") String score2, @RequestParam(value = "score3") String score3,

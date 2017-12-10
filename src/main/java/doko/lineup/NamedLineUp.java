@@ -3,42 +3,53 @@ package doko.lineup;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import doko.database.player.Player;
+import doko.database.player.PlayerService;
+
 public class NamedLineUp extends LineUp {
 
-	private Long[] ids;
+	private List<Long> ids;
+	private List<Player> players;
 	private String lineUpString;
 	private boolean valid;
 	private String lineUpName;
-	private static int ABBREVIATED_NAME_LENGTH = 2;
+	private static final int ABBREVIATED_NAME_LENGTH = 2;
 
-	public NamedLineUp(LineUp lineUp, List<String> playerNames) {
+	public NamedLineUp(LineUp lineUp, PlayerService playerService) {
 		ids = lineUp.getIds();
 		lineUpString = lineUp.getLineUpString();
 		valid = lineUp.isValid();
-		List<String> shortNames = playerNames.stream()
+		players = playerService.getPlayers(ids);
+		players.sort(null); // Sorting players in their defined order is necessary to assure that players are in the same order as the ids
+		List<String> shortNames = players.stream()
+				.map(Player::getName)
 				.map(NamedLineUp::subStringOfN)
 				.collect(Collectors.toList());
 		lineUpName = String.join("", shortNames) + "-Runde";
 	}
 
-	public String getLineUpName() {
-		return lineUpName;
+	public List<Long> getIds() {
+		return ids;
 	}
 
-	public Long[] getIds() {
-		return ids;
+	public List<Player> getPlayers() {
+		return players;
 	}
 
 	public boolean isValid() {
 		return valid;
 	}
 
+	public int size() {
+		return ids.size();
+	}
+
 	public String getLineUpString() {
 		return lineUpString;
 	}
 
-	public int size() {
-		return ids.length;
+	public String getLineUpName() {
+		return lineUpName;
 	}
 
 	private static String subStringOfN(String string) {

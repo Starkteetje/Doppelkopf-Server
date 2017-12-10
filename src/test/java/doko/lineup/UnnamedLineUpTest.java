@@ -3,26 +3,34 @@ package doko.lineup;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Test;
 
 public class UnnamedLineUpTest {
 
-	UnnamedLineUp lineUp1 = new UnnamedLineUp("1, 3,   7, 5,		90");
-	UnnamedLineUp lineUp2 = new UnnamedLineUp("1  ", " 3", "   7", " 5	", "		90");
-	UnnamedLineUp lineUp3 = new UnnamedLineUp(new Long(1), new Long(3), new Long(7), new Long(5), new Long(90));
-	UnnamedLineUp lineUp4 = new UnnamedLineUp("1,3,5,7");
-	UnnamedLineUp lineUp5 = new UnnamedLineUp(new Long(1), new Long(7), new Long(5), new Long(3));
+	LineUp lineUp1 = new UnnamedLineUp("1, 3,   7, 5,		90");
+	LineUp lineUp2 = new UnnamedLineUp("1  ", " 3", "   7", " 5	", "		90");
+	LineUp lineUp3 = new UnnamedLineUp(new Long(1), new Long(3), new Long(7), new Long(5), new Long(90));
+	LineUp lineUp4 = new UnnamedLineUp("1,3,5,7");
+	LineUp lineUp5 = new UnnamedLineUp(new Long(1), new Long(7), new Long(5), new Long(3));
 
-	UnnamedLineUp lineUp6 = new UnnamedLineUp("NaN, Infinity, -7, 99");
-	UnnamedLineUp lineUp7 = new UnnamedLineUp("ab, 1, 2, 3");
+	LineUp lineUp6 = new UnnamedLineUp("NaN, Infinity, -7, 99");
+	LineUp lineUp7 = new UnnamedLineUp("ab, 1, 2, 3");
 
-	UnnamedLineUp lineUp8 = new UnnamedLineUp("1,2,3,NaN");
-	UnnamedLineUp lineUp9 = new UnnamedLineUp("1,2,3,Infinity");
-	UnnamedLineUp lineUp10 = new UnnamedLineUp("1,2,3,-4");
-	UnnamedLineUp lineUp11 = new UnnamedLineUp("1,2,3,null");
-	UnnamedLineUp lineUp12 = new UnnamedLineUp("1,2,3,1");
+	LineUp lineUp8 = new UnnamedLineUp("1,2,3,NaN");
+	LineUp lineUp9 = new UnnamedLineUp("1,2,3,Infinity");
+	LineUp lineUp10 = new UnnamedLineUp("1,2,3,-4");
+	LineUp lineUp11 = new UnnamedLineUp("1,2,3,null");
+	LineUp lineUp12 = new UnnamedLineUp("1,2,3,1");
 
-	Long[] longs = { null, new Long(3), new Long(7) };
+	static List<Long> longs = new ArrayList<>();
+	static {
+		longs.add(null);
+		longs.add(new Long(3));
+		longs.add(new Long(7));
+	}
 
 	@Test
 	public void testEquals() {

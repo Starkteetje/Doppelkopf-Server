@@ -1,20 +1,29 @@
 package doko.lineup;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.List;
 
 public class UnnamedLineUp extends LineUp {
 
-	private Long[] ids;
+	private List<Long> ids;
 	private String lineUpString;
 	private boolean valid;
-	private static int LINEUP_LENGTH = 4;
+	private static final int LINEUP_LENGTH = 4;
 
 	public UnnamedLineUp(Long... ids) {
-		this.ids = ids;
-		Arrays.sort(this.ids, nullComparator);
+		this.ids = new ArrayList<>();
+		for (Long id : ids) {
+			this.ids.add(id);
+		}
+		this.ids.sort(nullComparator);
 		valid = isValid(this.ids);
 		lineUpString = getLineUpString(this.ids);
+	}
+
+	public UnnamedLineUp(List<Long> ids) {
+		this(ids.toArray(new Long[ids.size()]));
 	}
 
 	public UnnamedLineUp(String... idStrings) {
@@ -37,7 +46,7 @@ public class UnnamedLineUp extends LineUp {
 		this(lineUpString.split(","));
 	}
 
-	public Long[] getIds() {
+	public List<Long> getIds() {
 		return ids;
 	}
 
@@ -45,22 +54,22 @@ public class UnnamedLineUp extends LineUp {
 		return lineUpString;
 	}
 
-	protected static String getLineUpString(Long[] ids) {
-		Arrays.sort(ids, nullComparator);
-		return String.join(",", Arrays.stream(ids).map(id -> id == null ? "-1" : id.toString()).toArray(String[]::new));
+	protected static String getLineUpString(List<Long> ids) {
+		ids.sort(nullComparator);
+		return String.join(",", ids.stream().map(id -> id == null ? "-1" : id.toString()).toArray(String[]::new));
 	}
 
 	public boolean isValid() {
 		return valid;
 	}
 
-	private static boolean isValid(Long[] ids) {
-		return ids.length == LINEUP_LENGTH
+	private static boolean isValid(List<Long> ids) {
+		return ids.size() == LINEUP_LENGTH
 				&& !containsInvalidLong(ids)
-				&& Arrays.stream(ids).distinct().toArray().length == LINEUP_LENGTH;
+				&& ids.stream().distinct().toArray().length == LINEUP_LENGTH;
 	}
 
-	private static boolean containsInvalidLong(Long[] ids) {
+	private static boolean containsInvalidLong(List<Long> ids) {
 		for (Long id : ids) {
 			if (id == null || id < 1) {
 				return true;
@@ -76,6 +85,6 @@ public class UnnamedLineUp extends LineUp {
 	};
 
 	public int size() {
-		return ids.length;
+		return ids.size();
 	}
 }

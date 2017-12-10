@@ -10,5 +10,7 @@ public interface PlayerRepository extends CrudRepository<Player, Long> {
 
 	List<Player> findAll();
 
+	Player findOne(Long id);
+
 	List<Player> findByIdIn(List<Long> ids);
 }

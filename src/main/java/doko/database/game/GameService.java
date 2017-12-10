@@ -2,7 +2,6 @@ package doko.database.game;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,19 +39,16 @@ public class GameService {
 		}
 	}
 
-	public void makeZeroSumGame(SortedGame game) {
-		// TODO
-	}
-
-	public Set<LineUp> getAllLineUps() {
+	public List<LineUp> getAllLineUps() {
 		List<SortedGame> games = getValidGames();
 		return games.stream()
 				.map(SortedGame::getLineUp)
-				.collect(Collectors.toSet());
+				.distinct()
+				.collect(Collectors.toList());
 	}
 
 	public LineUp[] getTopLineUps() {
-		Set<LineUp> lineUps = getAllLineUps();
+		List<LineUp> lineUps = getAllLineUps();
 		return lineUps.stream()
 				.sorted(new LineUpComparator(this))
 				.limit(DokoConstants.NUMBER_OF_TOP_LINEUPS)
@@ -60,7 +56,7 @@ public class GameService {
 	}
 
 	public LineUp[] getNonTopLineUps() {
-		Set<LineUp> nonTopLineUps = getAllLineUps();
+		List<LineUp> nonTopLineUps = getAllLineUps();
 		nonTopLineUps.removeAll(Arrays.asList(getTopLineUps()));
 		return nonTopLineUps.stream()
 				.sorted(new LineUpComparator(this))

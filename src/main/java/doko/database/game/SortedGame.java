@@ -5,27 +5,26 @@ import java.util.Date;
 import java.util.List;
 
 import doko.lineup.LineUp;
+import doko.lineup.UnnamedLineUp;
 
 public class SortedGame {
 
 	private LineUp lineUp;
-	private List<String> scores;
+	private List<Long> scores;
 	private boolean valid;
 	private Date date;
 
 	public SortedGame(Game game) {
-		lineUp = game.getLineUp();
+		lineUp = new UnnamedLineUp(game.getPlayerIds());
+		scores = game.getScores();
 		valid = lineUp.isValid();
 		date = game.getDate();
-		scores = new ArrayList<>();
 
 		for (int i = 0; i < lineUp.size(); i++) {
-			Long score = game.getScoreOf(lineUp.getIds()[i]);
+			Long score = scores.get(i);
 			if (score == null) {
 				valid = false;
-				scores.add("");
-			} else {
-				scores.add(score.toString());
+				scores.set(i, 0L);
 			}
 		}
 	}
@@ -34,7 +33,7 @@ public class SortedGame {
 		return lineUp;
 	}
 
-	public List<String> getScores() {
+	public List<Long> getScores() {
 		return scores;
 	}
 
@@ -46,8 +45,8 @@ public class SortedGame {
 		return date;
 	}
 
-	public List<String> getScoresWithDate() {
-		List<String> scoresWithDate = new ArrayList<>();
+	public List<Object> getScoresWithDate() {
+		List<Object> scoresWithDate = new ArrayList<>();
 		scoresWithDate.addAll(scores);
 		scoresWithDate.add(date.toString());
 		return scoresWithDate;

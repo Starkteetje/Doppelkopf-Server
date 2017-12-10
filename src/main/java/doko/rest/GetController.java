@@ -23,6 +23,7 @@ import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.user.User;
 import doko.lineup.LineUp;
+import doko.lineup.NamedLineUp;
 import doko.lineup.UnnamedLineUp;
 import doko.velocity.HtmlProvider;
 
@@ -45,7 +46,7 @@ public class GetController extends RequestController {
 	}
 
 	@GetMapping(value = "/lineupgames", produces = "application/json")
-	public ResponseEntity<List<List<String>>> getLineUpGamesAsJSON(
+	public ResponseEntity<List<List<Object>>> getLineUpGamesAsJSON(
 			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
 		LineUp lineUp = new UnnamedLineUp(lineUpString);
 		return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
@@ -94,11 +95,12 @@ public class GetController extends RequestController {
 		String successes = ""; // TODO
 		String lineUpRules = getRules(lineUpString);
 		boolean isMoneyLineUp = lineUpString.equals(DokoConstants.DEFAULT_LINEUP_STRING); //TODO
-		List<List<String>> lineUpGames = getLineUpGames(lineUpString);
+		NamedLineUp lineUp = playerService.getNamedLineUp(lineUpString);
+		List<SortedGame> lineUpGames = gameService.getGamesForLineUp(lineUp);
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, tokenService, isLoggedIn);
 		return new ResponseEntity<>(
-				velocity.getDisplayLineUpPageHtml(errors, successes, lineUpRules, lineUpGames, isMoneyLineUp), HttpStatus.OK);
+				velocity.getDisplayLineUpPageHtml(errors, successes, lineUpRules, lineUp, lineUpGames, isMoneyLineUp), HttpStatus.OK);
 
 	}
 
