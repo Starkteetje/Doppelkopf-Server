@@ -40,16 +40,14 @@ public class PostController extends RequestController {
 		String storedPw = user.get().getPassword();
 		Long userId = user.get().getId();
 		if (BCrypt.checkpw(password, storedPw)) {
-			Token token = tokenService.generateNewToken(user.get());
+			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, userId);
 
-			//TODO mark cookie as secure if HTTPS possible
 			if (keepLoggedIn.equals("on")) {
-				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
+				Token token = tokenService.generateNewToken(user.get());
+				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());//TODO mark cookie as secure if HTTPS possible
 				rememberCookie.setMaxAge(60 * 60 * 24 * 30); // Cookie is stored for 30 days
 				response.addCookie(rememberCookie);
 			}
-			request.getSession().setAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME, "true");
-			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, userId);
 
 			try {
 				response.sendRedirect("/");
@@ -81,28 +79,34 @@ public class PostController extends RequestController {
 	}
 
 	@RequestMapping(value = "report", method = RequestMethod.POST) //TODO need protection from CSRF
-	public ResponseEntity<List<List<Object>>> reportNewGame(@RequestParam(value = "id1") String id1,
+	public ResponseEntity<List<List<Object>>> reportNewGame(HttpServletRequest request,
+			HttpServletResponse response, @RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
 			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
 			@RequestParam(value = "score2") String score2, @RequestParam(value = "score3") String score3,
-			@RequestParam(value = "score4") String score4, @RequestParam(value = "date") String date,
-			@RequestParam(value = "token") String token) {
-		Long submitterId = tokenService.getUserIdOfToken(token);
-		if (submitterId == null) {
-			return ErrorPageController.getUnauthorizedPage();
-		} else {
-			SimpleDateFormat sdf = new SimpleDateFormat("E dd.MM.yyyy", Locale.GERMAN);
+			@RequestParam(value = "score4") String score4, @RequestParam(value = "date") String date) {
+		Optional<User> user = getLoggedInUser(request);
+		if (user.isPresent()) {
+			Long submitterId = user.get().getId();
+			SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT, Locale.GERMAN);
 			Game game;
 			try {
 				game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, sdf.parse(date));
 			} catch (Exception e) {
 				// TODO wrong date format, id or score <- log
-				e.printStackTrace();
 				return ErrorPageController.getBadRequestPage();
 			}
 			gameService.insertGame(game);
 			LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
-			return new ResponseEntity<>(getLineUpGames(lineUp), HttpStatus.OK);
+			try {
+				response.sendRedirect("/lineup?lineup=" + lineUp.getLineUpString());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else {
+			return ErrorPageController.getUnauthorizedPage();
 		}
 	}
 }

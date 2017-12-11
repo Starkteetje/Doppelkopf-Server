@@ -13,4 +13,6 @@ public interface TokenRepository extends CrudRepository<Token, Long> {
 	List<Token> findByIdIn(List<Long> ids);
 
 	List<Token> findByUserId(Long id);
+
+	Token findOneByTokenValue(String tokenValue);
 }

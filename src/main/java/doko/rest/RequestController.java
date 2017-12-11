@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
+import doko.database.token.Token;
 import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.database.user.UserService;
@@ -35,18 +37,51 @@ public class RequestController {
 	@Autowired
 	protected UserService userService;
 
-	public boolean isUserLoggedIn(HttpServletRequest request) {
-		Object loginStatus = request.getSession().getAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
-		return loginStatus != null && ((String) loginStatus).equals("true");
+	public Optional<User> getLoggedInUser(HttpServletRequest request) {
+		Optional<Long> userId = getLoggedInUserId(request);
+		if (userId.isPresent()) {
+			return userService.getUser(userId.get());
+		}
+		return Optional.ofNullable(null);
 	}
 
-	public Optional<User> getLoggedInUser(HttpServletRequest request) {
+	public boolean isUserLoggedIn(HttpServletRequest request) {
+		Optional<User> loggedInUser = getLoggedInUser(request);
+		return loggedInUser.isPresent();
+	}
+
+	private Optional<Long> getLoggedInUserId(HttpServletRequest request) {
 		Object userId = request.getSession().getAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
-		try {
-			return userService.getUser((Long) userId);
-		} catch (Exception e) {
-			return Optional.ofNullable(null);
+		if (userId == null) {
+			return loginUserByLoginToken(request);
 		}
+		return Optional.of((Long) userId);
+	}
+
+	private Optional<Long> loginUserByLoginToken(HttpServletRequest request) {
+		Cookie rememberCookie = getRememberCookie(request);
+		if (rememberCookie != null) {
+			String tokenValue = rememberCookie.getValue();
+			Optional<Token> token = tokenService.getTokenByValue(tokenValue);
+			if (token.isPresent()) {
+				Long userId = token.get().getUserId();
+				request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, userId);
+				return Optional.of(userId);
+			}
+		}
+		return Optional.ofNullable(null);
+	}
+
+	protected Cookie getRememberCookie(HttpServletRequest request) {
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(DokoConstants.LOGIN_COOKIE_NAME)) {
+					return cookie;
+				}
+			}
+		}
+		return null;
 	}
 
 	public List<List<Object>> getLineUpGames(LineUp lineUp) {

@@ -121,11 +121,15 @@ public class GetController extends RequestController {
 	}
 
 	@RequestMapping(value = "logout", method = RequestMethod.GET)
-	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {
-		request.getSession().removeAttribute(DokoConstants.SESSION_LOGIN_STATUS_ATTRIBUTE_NAME);
-		Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
-		rememberCookie.setMaxAge(0); // Delete Cookie
-		response.addCookie(rememberCookie);
+	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//changes server stuff, so move to post
+		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
+		Cookie storedCookie = getRememberCookie(request);
+		if (storedCookie != null) {
+			tokenService.deleteTokenByValue(storedCookie.getValue());
+		}
+		Cookie deleteCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
+		deleteCookie.setMaxAge(0); // Delete Cookie
+		response.addCookie(deleteCookie);
 
 		try {
 			response.sendRedirect("/");

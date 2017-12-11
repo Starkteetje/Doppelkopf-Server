@@ -8,11 +8,11 @@ public abstract class DokoConstants {
 
 	public static final int NUMBER_OF_TOP_LINEUPS = 5;
 
-	public static final String SESSION_LOGIN_STATUS_ATTRIBUTE_NAME = "login_status";
-
 	public static final String SESSION_USER_ID_ATTRIBUTE_NAME = "user_id";
 
 	public static final String DEFAULT_LINEUP_STRING = "1,2,3,4";
 
 	public static final String OUTPUT_DATE_FORMAT = "dd.MM.yy";
+
+	public static final String INPUT_DATE_FORMAT = "E dd.MM.yyyy";
 }
