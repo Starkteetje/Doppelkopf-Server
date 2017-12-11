@@ -19,6 +19,16 @@ public class AdditionalResourceController {
 		return new ResponseEntity<>(fileExposer.getDatepickerIcons(), HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/images/warning.png", produces = "image/png")
+	public ResponseEntity<byte[]> getWarningImage() {
+		return new ResponseEntity<>(fileExposer.getWarningIcon(), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/images/task.png", produces = "image/png")
+	public ResponseEntity<byte[]> getTaskImage() {
+		return new ResponseEntity<>(fileExposer.getTaskIcon(), HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/style", produces = "text/css")
 	public ResponseEntity<byte[]> getCSS() {
 		return new ResponseEntity<>(fileExposer.getMainCSS(), HttpStatus.OK);

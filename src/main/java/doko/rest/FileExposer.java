@@ -35,6 +35,14 @@ public class FileExposer {
 		return getImage("dokoblatt.png");
 	}
 
+	public byte[] getWarningIcon() {
+		return getImage("warning.png");
+	}
+
+	public byte[] getTaskIcon() {
+		return getImage("task.png");
+	}
+
 	public byte[] getJS1() {
 		return getJS("datepicker1.js");
 	}

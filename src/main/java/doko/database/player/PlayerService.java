@@ -2,6 +2,7 @@ package doko.database.player;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,16 @@ public class PlayerService {
 		return playerRepository.findAll();
 	}
 
-	public Player getPlayer(Long id) {
-		return playerRepository.findOne(id);
+	public Optional<Player> getPlayer(Long id) {
+		return Optional.ofNullable(playerRepository.findOne(id));
 	}
 
 	public List<Player> getPlayers(List<Long> ids) {
 		return playerRepository.findByIdIn(ids);
+	}
+
+	public Optional<Player> getPlayerByName(String playerName) {
+		return Optional.ofNullable(playerRepository.findOneByName(playerName));
 	}
 
 	public NamedLineUp getNamedLineUp(LineUp lineUp) {
@@ -39,6 +44,17 @@ public class PlayerService {
 		return Arrays.stream(lineUps)
 				.map(this::getNamedLineUp)
 				.toArray(NamedLineUp[]::new);
+	}
+
+	public boolean addPlayer(String playerName) {
+		Optional<Player> existingPlayer = getPlayerByName(playerName);
+		if (existingPlayer.isPresent()) {
+			return false;
+		} else {
+			Player player = new Player(playerName);
+			playerRepository.save(player);
+			return true;
+		}
 	}
 
 	@Autowired

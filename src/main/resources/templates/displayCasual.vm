@@ -1,9 +1,5 @@
 <h1>Ergebnisse</h1>
 
-$successes
-
-$errors
-
 #if ($games.size() > 0)
 	#set ($players = $lineUp.getPlayers())
 	<table class="results">

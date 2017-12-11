@@ -10,6 +10,10 @@ public abstract class DokoConstants {
 
 	public static final String SESSION_USER_ID_ATTRIBUTE_NAME = "user_id";
 
+	public static final String SESSION_ERROR_MESSAGE_ATTRIBUTE_NAME = "error";
+
+	public static final String SESSION_SUCCESS_MESSAGE_ATTRIBUTE_NAME = "success";
+
 	public static final String DEFAULT_LINEUP_STRING = "1,2,3,4";
 
 	public static final String OUTPUT_DATE_FORMAT = "dd.MM.yy";

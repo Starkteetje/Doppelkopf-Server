@@ -2,7 +2,6 @@ package doko.rest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -70,16 +69,28 @@ public class PostController extends RequestController {
 		Long userId = user.get().getId();
 		boolean deleted = tokenService.deleteTokensOfUser(userId);
 		if (deleted) {
-			String success = "Die Gültigkeit aller Login-Tokens wurde widerrufen.";
-			return new ResponseEntity<>(HttpStatus.OK); //TODO
+			setSuccess(request, "Die Gültigkeit aller Login-Tokens wurde widerrufen.");
+			try {
+				response.sendRedirect("/profile");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
-			String error = "Fehler beim Löschen der Login-Token.";
-			return ErrorPageController.getServerErrorPage(); //TODO
+			setError(request, "Fehler beim Löschen der Login-Token.");
+			try {
+				response.sendRedirect("/profile");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
 		}
 	}
 
 	@RequestMapping(value = "report", method = RequestMethod.POST) //TODO need protection from CSRF
-	public ResponseEntity<List<List<Object>>> reportNewGame(HttpServletRequest request,
+	public ResponseEntity<String> reportNewGame(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
 			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
@@ -103,6 +114,35 @@ public class PostController extends RequestController {
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			return new ResponseEntity<>(HttpStatus.OK);
+		} else {
+			return ErrorPageController.getUnauthorizedPage();
+		}
+	}
+
+	@RequestMapping(value = "addplayer", method = RequestMethod.POST) //TODO need protection from CSRF
+	public ResponseEntity<String> addPlayer(HttpServletRequest request,
+			HttpServletResponse response, @RequestParam(value = "name") String playerName) {
+		if (isUserLoggedIn(request)) {
+			boolean added = playerService.addPlayer(playerName);
+			if (added) {
+				setSuccess(request, "Spieler erfolgreich hinzugefügt.");
+				try {
+					response.sendRedirect("/report");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else {
+				setError(request, "Fehler beim Hinzufügen des Spielers. Prüfe, ob bereits ein Spieler mit diesem Namen existiert.");
+				try {
+					response.sendRedirect("/report");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {

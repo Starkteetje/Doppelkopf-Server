@@ -6,4 +6,50 @@
 	</head>
 
 	<body>
-	<center>
+		<center>
+
+			<ul class="navigation">
+			  <li class="left"><a href="lineup?lineup=1,2,3,4">AMST-Runde</a></li>
+			  #foreach ($lineUp in $topLineUps)
+			  	#if ($lineUp.getLineUpString() != "1,2,3,4")
+			  		<li class="left"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName() </a></li>
+			  	#end
+			  #end
+			  <li class="left"><div class="dropDown">Weitere Runden<ul class="vertical">
+			  #foreach ($lineUp in $nonTopLineUps)
+				#if ($lineUp.getLineUpString() != "1,2,3,4")
+			  		<li class=\"left\"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName()</a></li>
+				#end
+			  #end
+			  </ul></div></li>
+
+			  #if ($isLoggedIn)
+			  	<li class="right"><a href="report">Neue Ergebnisse eintragen</a></li>
+			  
+			  	<li class="right"><a href="logout">Ausloggen</a></li>
+			  	<li class="right"><a href="profile">Profil</a></li>
+			  #else
+			  	<li class="right"><a href="login">Einloggen</a></li>
+			  #end
+			</ul>
+
+			<div id="errors" class="messages">
+				#if ($error != "")
+					<div class="errors">
+						<img src="images/warning.png" alt="error" height=16 width=16 class="message-icon-error"><span>$error</span>
+					</div>
+				#end
+				#if ($success != "")
+					<div class="successes">
+						<img src="images/task.png" alt="success" height=16 width=16 class="message-icon-success"><span>$success</span>
+					</div>
+				#end
+			</div>
+
+		<script type="text/javascript">
+			function hideElement(id) {
+				document.getElementById(id).style.display = "none";
+			}
+			setTimeout(hideElement, 10000, "errors")
+			setTimeout(hideElement, 10000, "successes")
+		</script>

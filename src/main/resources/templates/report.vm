@@ -1,9 +1,5 @@
 <h1>Neue Ergebnisse</h1>
 
-$successes
-
-$errors
-
 <form action="report" autocomplete="off" method="post">
 <table class="noborder">
 <tr class="noborder">
@@ -124,4 +120,12 @@ $errors
 <p>Datum: <input type="text" id="datepicker" name="date"></p>
 <input type="submit" value="Ergebnisse speichern" />
 
+</form>
+
+<br />
+
+<form action="addplayer" method="post">
+	<input type="text" placeholder="Name" name="name" maxlength=20 />
+	<br />
+	<input type="submit" value="Neuen Spieler hinzufügen" />
 </form>

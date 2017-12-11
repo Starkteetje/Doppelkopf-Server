@@ -15,7 +15,6 @@ import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
-import doko.database.token.TokenService;
 import doko.database.user.User;
 import doko.lineup.NamedLineUp;
 
@@ -23,60 +22,55 @@ public class HtmlProvider {
 
 	private GameService gameService;
 	private PlayerService playerService;
-	private TokenService tokenService;
 	private boolean isLoggedIn;
 
-	public HtmlProvider(GameService gameService, PlayerService playerService, TokenService tokenService, boolean isLoggedIn) {
+	public HtmlProvider(GameService gameService, PlayerService playerService, boolean isLoggedIn) {
 		this.gameService = gameService;
 		this.playerService = playerService;
-		this.tokenService = tokenService;
 		this.isLoggedIn = isLoggedIn;
 	}
 
-	private String getPageHtml(String mainHtml) {
+	private String getPageHtml(String error, String success, String mainHtml) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(getHeader());
-		sb.append(getNavigation());
+		sb.append(getHeader(error, success));
 		sb.append(mainHtml);
 		sb.append(getFooter());
 		return sb.toString();
 	}
 
-	public String getLoginPageHtml(String errors, String successes) {
-		String loginHtml = getLoginHtml(errors, successes);
-		return getPageHtml(loginHtml);
+	public String getLoginPageHtml(String error, String success) {
+		String loginHtml = getLoginHtml();
+		return getPageHtml(error, success, loginHtml);
 	}
 
-	private String getLoginHtml(String errors, String successes) {
+	private String getLoginHtml() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/login.vm");
 		VelocityContext context = new VelocityContext();
-		context.put("errors", errors);
-		context.put("successes", successes);
 
 		return ve.getFilledTemplate(context);
 	}
 
-	public String getReportingPageHtml(String errors, String successes, List<Player> players) {
-		String reportingHtml = getReportingHtml(players, errors, successes);
-		return getPageHtml(reportingHtml);
+	public String getReportingPageHtml(String error, String success, List<Player> players) {
+		String reportingHtml = getReportingHtml(players);
+		return getPageHtml(error, success, reportingHtml);
 	}
 
-	private String getReportingHtml(List<Player> players, String errors, String successes) {
+	private String getReportingHtml(List<Player> players) {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/report.vm");
 		VelocityContext context = new VelocityContext();
 		context.put("players", players);
-		context.put("errors", errors);
-		context.put("successes", successes);
 
 		return ve.getFilledTemplate(context);
 	}
 
-	public String getDisplayLineUpPageHtml(String errors, String successes, String lineUpRules, NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp) {
-		String displayHtml = getDisplayHtml(lineUp, lineUpGames, isMoneyLineUp, lineUpRules, errors, successes);
-		return getPageHtml(displayHtml);
+	public String getDisplayLineUpPageHtml(String error, String success, String lineUpRules,
+			NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp) {
+		String displayHtml = getDisplayHtml(lineUp, lineUpGames, isMoneyLineUp, lineUpRules);
+		return getPageHtml(error, success, displayHtml);
 	}
 
-	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp, String lineUpRules, String errors, String successes) {
+	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp,
+			String lineUpRules) {
 		VelocityTemplateHandler ve;
 		if (isMoneyLineUp) {
 			ve = new VelocityTemplateHandler("templates/displayMoney.vm");
@@ -95,8 +89,6 @@ public class HtmlProvider {
 		context.put("dataPerSession", perSessionJSON);
 		context.put("ticks", ticksJSON);
 		context.put("rules", lineUpRules);
-		context.put("errors", errors);
-		context.put("successes", successes);
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
@@ -165,42 +157,36 @@ public class HtmlProvider {
 		return graphData;
 	}
 
-	public String getProfilePageHtml(String errors, String successes, User user) {
-		String profileHtml = getProfileHtml(user, errors, successes);
-		return getPageHtml(profileHtml);
+	public String getProfilePageHtml(String error, String success, User user) {
+		String profileHtml = getProfileHtml(user);
+		return getPageHtml(error, success, profileHtml);
 	}
 
-	private String getProfileHtml(User user, String errors, String successes) {
+	private String getProfileHtml(User user) {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/profile.vm");
 		VelocityContext context = new VelocityContext();
 		context.put("username", user.getUsername());
 		context.put("mail", user.getEmail());
-		context.put("errors", errors);
-		context.put("successes", successes);
 
 		return ve.getFilledTemplate(context);
 	}
 
-	private String getHeader() {
+	private String getHeader(String error, String success) {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/header.vm");
+		VelocityContext context = new VelocityContext();
+		context.put("topLineUps", getTopLineUps());
+		context.put("nonTopLineUps", getNonTopLineUps());
+		context.put("isLoggedIn", isLoggedIn);
+		context.put("error", error);
+		context.put("success", success);
 
-		return ve.getFilledTemplate(new VelocityContext());
+		return ve.getFilledTemplate(context);
 	}
 
 	private String getFooter() {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/footer.vm");
 
 		return ve.getFilledTemplate(new VelocityContext());
-	}
-
-	private String getNavigation() {
-		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/navigation.vm");
-		VelocityContext context = new VelocityContext();
-		context.put("topLineUps", getTopLineUps());
-		context.put("nonTopLineUps", getNonTopLineUps());
-		context.put("isLoggedIn", isLoggedIn);
-
-		return ve.getFilledTemplate(context);
 	}
 
 	private NamedLineUp[] getTopLineUps() {

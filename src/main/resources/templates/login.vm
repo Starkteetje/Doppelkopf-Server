@@ -1,10 +1,6 @@
 <h1>Login</h1>
 <br />
 
-$successes
-
-$errors
-
 <form action="login" method="post">
 	<table class="noborder" bgcolor="#006980">
 		<tr class="noborder">
@@ -21,11 +17,7 @@ $errors
 		</tr>
 		<tr class="noborder">
 			<td class="noborder"></td>
-			<td class="noborder"><input type="submit" value="Anmelden*" /></td>
-		</tr>
-		<tr class="noborder">
-			<td class="noborder"></td>
-			<td class="noborder"><small>* Bei der Anmeldung wird ein Cookie im Browser gesetzt. Falls die Option "Eingeloggt bleiben" nicht verwendet wird, wird der Cookie beim Beenden des Browsers gelöscht.</small></td>
+			<td class="noborder"><input type="submit" value="Anmelden" /></td>
 		</tr>
 	</table>
 </form>

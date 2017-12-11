@@ -120,4 +120,36 @@ public class RequestController {
 		LineUp lineUp = new UnnamedLineUp(lineUpString);
 		return getRules(lineUp);
 	}
+
+	protected void setError(HttpServletRequest request, String error) {
+		request.getSession().setAttribute(DokoConstants.SESSION_ERROR_MESSAGE_ATTRIBUTE_NAME, error);
+	}
+
+	protected void setSuccess(HttpServletRequest request, String success) {
+		request.getSession().setAttribute(DokoConstants.SESSION_SUCCESS_MESSAGE_ATTRIBUTE_NAME, success);
+	}
+
+	protected String consumeErrorMessage(HttpServletRequest request) {
+		String errorString;
+		Object error = request.getSession().getAttribute(DokoConstants.SESSION_ERROR_MESSAGE_ATTRIBUTE_NAME);
+		if (error == null) {
+			errorString = "";
+		} else {
+			errorString = (String) error;
+		}
+		request.getSession().removeAttribute(DokoConstants.SESSION_ERROR_MESSAGE_ATTRIBUTE_NAME);
+		return errorString;
+	}
+
+	protected String consumeSuccessMessage(HttpServletRequest request) {
+		String successString;
+		Object success = request.getSession().getAttribute(DokoConstants.SESSION_SUCCESS_MESSAGE_ATTRIBUTE_NAME);
+		if (success == null) {
+			successString = "";
+		} else {
+			successString = (String) success;
+		}
+		request.getSession().removeAttribute(DokoConstants.SESSION_SUCCESS_MESSAGE_ATTRIBUTE_NAME);
+		return successString;
+	}
 }

@@ -1,10 +1,6 @@
 <h1>Hinterlegte Daten</h1>
 <br />
 
-$successes
-
-$errors
-
 Username : $username
 <br />
 Passwort : ******
