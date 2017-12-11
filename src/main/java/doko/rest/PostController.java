@@ -69,7 +69,7 @@ public class PostController extends RequestController {
 		Long userId = user.get().getId();
 		boolean deleted = tokenService.deleteTokensOfUser(userId);
 		if (deleted) {
-			setSuccess(request, "Die Gültigkeit aller Login-Tokens wurde widerrufen.");
+			setSuccess(request, "Die GÃ¼ltigkeit aller Login-Tokens wurde widerrufen.");
 			try {
 				response.sendRedirect("/profile");
 			} catch (IOException e) {
@@ -78,7 +78,7 @@ public class PostController extends RequestController {
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
-			setError(request, "Fehler beim Löschen der Login-Token.");
+			setError(request, "Fehler beim LÃ¶schen der Login-Token.");
 			try {
 				response.sendRedirect("/profile");
 			} catch (IOException e) {
@@ -127,7 +127,7 @@ public class PostController extends RequestController {
 		if (isUserLoggedIn(request)) {
 			boolean added = playerService.addPlayer(playerName);
 			if (added) {
-				setSuccess(request, "Spieler erfolgreich hinzugefügt.");
+				setSuccess(request, "Spieler erfolgreich hinzugefÃ¼gt.");
 				try {
 					response.sendRedirect("/report");
 				} catch (IOException e) {
@@ -136,7 +136,7 @@ public class PostController extends RequestController {
 				}
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
-				setError(request, "Fehler beim Hinzufügen des Spielers. Prüfe, ob bereits ein Spieler mit diesem Namen existiert.");
+				setError(request, "Fehler beim HinzufÃ¼gen des Spielers. PrÃ¼fe, ob bereits ein Spieler mit diesem Namen existiert.");
 				try {
 					response.sendRedirect("/report");
 				} catch (IOException e) {
