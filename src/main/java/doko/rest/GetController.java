@@ -28,12 +28,12 @@ import doko.velocity.HtmlProvider;
 @RestController
 public class GetController extends RequestController {
 
-	@GetMapping(value = "/", produces = "text/html")
+	@GetMapping(value = DokoConstants.INDEX_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> getIndex(HttpServletRequest request) {
 		return displayLineUp(request, DokoConstants.DEFAULT_LINEUP_STRING);
 	}
 
-	@GetMapping(value = "/lineup", produces = "text/html")
+	@GetMapping(value = DokoConstants.LINE_UP_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> displayLineUp(HttpServletRequest request,
 			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
 		boolean isLoggedIn = isUserLoggedIn(request);
@@ -50,7 +50,7 @@ public class GetController extends RequestController {
 
 	}
 
-	@GetMapping(value = "/login", produces = "text/html")
+	@GetMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> getLoginPage(HttpServletRequest request) {
 		boolean isLoggedIn = isUserLoggedIn(request);
 		String error = consumeErrorMessage(request);
@@ -61,7 +61,7 @@ public class GetController extends RequestController {
 				HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/report", produces = "text/html")
+	@GetMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> getReportingPage(HttpServletRequest request) {
 		boolean isLoggedIn = isUserLoggedIn(request);
 		String error = consumeErrorMessage(request);
@@ -73,7 +73,7 @@ public class GetController extends RequestController {
 				velocity.getReportingPageHtml(error, success, players), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/profile", produces = "text/html")
+	@GetMapping(value = DokoConstants.PROFILE_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> getProfile(HttpServletRequest request,
 			@RequestParam(value = "lineup", defaultValue = DokoConstants.DEFAULT_LINEUP_STRING) String lineUpString) {
 		boolean isLoggedIn = isUserLoggedIn(request);
@@ -89,7 +89,7 @@ public class GetController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@RequestMapping(value = "logout", method = RequestMethod.GET)
+	@RequestMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION, method = RequestMethod.GET)
 	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//changes server stuff, so move to post. also CSRF
 		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
 		Cookie storedCookie = getRememberCookie(request);

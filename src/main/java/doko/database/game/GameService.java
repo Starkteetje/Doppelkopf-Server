@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import doko.DokoConstants;
+import doko.database.player.Player;
+import doko.database.round.Round;
 import doko.lineup.LineUp;
 import doko.lineup.LineUpComparator;
 
@@ -31,12 +33,8 @@ public class GameService {
 				.collect(Collectors.toList());
 	}
 
-	public void insertGame(Game game) {
-		try {
-			gameRepository.save(game);
-		} catch (Exception e) {
-			System.out.println("Game couldn't be saved"); //TODO Log properly, send error to user
-		}
+	public Game addGame(Game game) {
+		return gameRepository.save(game);
 	}
 
 	public List<LineUp> getAllLineUps() {
@@ -66,5 +64,10 @@ public class GameService {
 	@Autowired
 	public void setGameRepository(GameRepository gameRepository) {
 		this.gameRepository = gameRepository;
+	}
+
+	public Game createGameFromRounds(List<Round> rounds, List<Player> players) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

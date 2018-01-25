@@ -1,4 +1,4 @@
-package doko.database.game;
+package doko.database.round;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +75,10 @@ public class Round {
 	}
 
 	public Round() {
+	}
+
+	public Long getId() {
+		return id;
 	}
 
 	public List<Long> getPlayerIds() {

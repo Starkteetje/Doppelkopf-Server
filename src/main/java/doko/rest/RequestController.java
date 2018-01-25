@@ -14,6 +14,7 @@ import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
+import doko.database.round.RoundService;
 import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
 import doko.database.token.Token;
@@ -30,6 +31,8 @@ public class RequestController {
 	protected GameService gameService;
 	@Autowired
 	protected PlayerService playerService;
+	@Autowired
+	protected RoundService roundService;
 	@Autowired
 	protected RulesService rulesService;
 	@Autowired

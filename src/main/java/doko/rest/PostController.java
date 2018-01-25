@@ -2,6 +2,7 @@ package doko.rest;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
 import doko.database.game.Game;
+import doko.database.player.Player;
+import doko.database.round.Round;
 import doko.database.token.Token;
 import doko.database.user.User;
 import doko.lineup.LineUp;
@@ -27,7 +30,7 @@ import doko.lineup.UnnamedLineUp;
 @RestController
 public class PostController extends RequestController {
 
-	@RequestMapping(value = "login", method = RequestMethod.POST) //TODO does this need protection from CSRF?
+	@RequestMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, method = RequestMethod.POST) //TODO does this need protection from CSRF?
 	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
 			@RequestParam(value = "remember_user", defaultValue = "false") String keepLoggedIn) {
@@ -48,18 +51,13 @@ public class PostController extends RequestController {
 				response.addCookie(rememberCookie);
 			}
 
-			try {
-				response.sendRedirect("/");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			redirectTo(response, DokoConstants.INDEX_PAGE_LOCATION);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@RequestMapping(value = "profile", method = RequestMethod.POST) //TODO need protection from CSRF
+	@RequestMapping(value = DokoConstants.PROFILE_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
 	public ResponseEntity<String> deleteAllLoginTokens(HttpServletRequest request, HttpServletResponse response) {
 		Optional<User> user = getLoggedInUser(request);
 		if (!user.isPresent()) {
@@ -70,27 +68,49 @@ public class PostController extends RequestController {
 		boolean deleted = tokenService.deleteTokensOfUser(userId);
 		if (deleted) {
 			setSuccess(request, "Die Gültigkeit aller Login-Tokens wurde widerrufen.");
-			try {
-				response.sendRedirect("/profile");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			redirectTo(response, DokoConstants.PROFILE_PAGE_LOCATION);
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			setError(request, "Fehler beim Löschen der Login-Token.");
-			try {
-				response.sendRedirect("/profile");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			redirectTo(response, DokoConstants.PROFILE_PAGE_LOCATION);
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 	}
 
-	@RequestMapping(value = "report", method = RequestMethod.POST) //TODO need protection from CSRF
-	public ResponseEntity<String> reportNewGame(HttpServletRequest request,
+	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST) //doesnt need CSRF prot now, because only send via app
+	public ResponseEntity<String> reportGameWithRounds(String someJSONThingy, String token) {
+		if (tokenService.isTokenValid(token)) {
+			//TODO parse JSON
+			List<Round> rounds = parseJSONForRounds(someJSONThingy);
+			List<Player> players = parseJSONForPlayers(someJSONThingy);
+			Game game = gameService.createGameFromRounds(rounds, players);//TODO saving game gives gameId for Rounds
+			boolean roundsAdded = addRounds(rounds);
+			boolean gameAdded = addGame(game);
+			if (!gameAdded && !roundsAdded) {
+				//TODO
+			} else if (!gameAdded || !roundsAdded) {
+				//TODO
+			} else {
+				//TODO
+			}
+			return new ResponseEntity<>(HttpStatus.OK); //TODO
+		} else {
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+		}
+	}
+
+	private List<Player> parseJSONForPlayers(String someJSONThingy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private List<Round> parseJSONForRounds(String someJSONThingy) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@RequestMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	public ResponseEntity<String> reportGame(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
 			@RequestParam(value = "id4") String id4, @RequestParam(value = "score1") String score1,
@@ -107,13 +127,14 @@ public class PostController extends RequestController {
 				// TODO wrong date format, id or score <- log
 				return ErrorPageController.getBadRequestPage();
 			}
-			gameService.insertGame(game);
-			LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
-			try {
-				response.sendRedirect("/lineup?lineup=" + lineUp.getLineUpString());
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			boolean wasAdded = addGame(game);
+			if (wasAdded) {
+				setSuccess(request, "Spiel erfolgreich gespeichert.");
+				LineUp lineUp = new UnnamedLineUp(id1, id2, id3, id4);
+				redirectTo(response, DokoConstants.LINE_UP_PAGE_LOCATION + "?lineup=" + lineUp.getLineUpString());
+			} else {
+				setError(request, "Das Spiel konnte nicht gespeichert werden. Versuche es erneut oder kontaktiere den Admin.");
+				redirectTo(response, DokoConstants.ADD_GAME_PAGE_LOCATION);
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
@@ -121,32 +142,49 @@ public class PostController extends RequestController {
 		}
 	}
 
-	@RequestMapping(value = "addplayer", method = RequestMethod.POST) //TODO need protection from CSRF
+	private boolean addGame(Game game) {
+		game = gameService.addGame(game);
+		//Check whether game was added
+		Long id = game.getId();
+		return id != null;
+	}
+
+	private boolean addRounds(Iterable<Round> rounds) {
+		rounds = roundService.addRounds(rounds);
+		for (Round round : rounds) {
+			if (round.getId() == null) {
+				// To avoid inconsistencies, delete all rounds, if a single save failed
+				roundService.delete(rounds);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@RequestMapping(value = DokoConstants.ADD_PLAYER_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
 	public ResponseEntity<String> addPlayer(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "name") String playerName) {
 		if (isUserLoggedIn(request)) {
 			boolean added = playerService.addPlayer(playerName);
 			if (added) {
 				setSuccess(request, "Spieler erfolgreich hinzugefügt.");
-				try {
-					response.sendRedirect("/report");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				redirectTo(response, DokoConstants.ADD_GAME_PAGE_LOCATION);
 				return new ResponseEntity<>(HttpStatus.OK);
 			} else {
 				setError(request, "Fehler beim Hinzufügen des Spielers. Prüfe, ob bereits ein Spieler mit diesem Namen existiert.");
-				try {
-					response.sendRedirect("/report");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+				redirectTo(response, DokoConstants.ADD_GAME_PAGE_LOCATION);
 			}
 			return new ResponseEntity<>(HttpStatus.OK);
 		} else {
 			return ErrorPageController.getUnauthorizedPage();
+		}
+	}
+
+	private void redirectTo(HttpServletResponse response, String destination) {
+		try {
+			response.sendRedirect(destination);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
 		}
 	}
 }

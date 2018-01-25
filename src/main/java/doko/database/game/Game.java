@@ -73,6 +73,10 @@ public class Game {
 	public Game() {
 	}
 
+	public Long getId() {
+		return id;
+	}
+
 	public List<Long> getPlayerIds() {
 		List<Long> ids = new ArrayList<>();
 		ids.add(player1);
