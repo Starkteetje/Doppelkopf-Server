@@ -3,9 +3,11 @@ package doko.database.round;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import doko.database.game.Game;
 
+@Service
 public class RoundService {
 
 	private RoundRepository roundRepository;
