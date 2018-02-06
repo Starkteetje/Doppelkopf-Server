@@ -124,8 +124,9 @@ public class PostController extends RequestController {
 			try {
 				game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, sdf.parse(date));
 			} catch (Exception e) {
-				// TODO wrong date format, id or score <- log
-				return ErrorPageController.getBadRequestPage();
+				setError(request, "Das Spiel konnte nicht gespeichert werden. Versuche es erneut oder kontaktiere den Admin.");
+				redirectTo(response, DokoConstants.ADD_GAME_PAGE_LOCATION);
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 			}
 			boolean wasAdded = addGame(game);
 			if (wasAdded) {

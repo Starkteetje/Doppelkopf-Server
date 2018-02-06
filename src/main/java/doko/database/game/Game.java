@@ -65,7 +65,7 @@ public class Game {
 	}
 
 	public Game(String player1, String score1, String player2, String score2, String player3, String score3,
-			String player4, String score4, Long submitted, Date date) {
+			String player4, String score4, Long submitted, Date date) { //TODO decide whether to accept empty entries (placeholder = 0) as 0
 		this(new Long(player1), new Long(score1), new Long(player2), new Long(score2), new Long(player3),
 				new Long(score3), new Long(player4), new Long(score4), submitted, date);
 	}

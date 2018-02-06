@@ -18,7 +18,7 @@ E-Mail-Adresse :
 <input type="submit" name="reset" value="Alle Logins wiederrufen" />
 </form>
 
-<h2>Passwort ändern</h2>
+<h2>Passwort Ã¤ndern</h2>
 <form action="changepw" method="post">
 	<table class="noborder">
 		<tr class="noborder">
@@ -42,7 +42,7 @@ E-Mail-Adresse :
 		<tr class="noborder">
 			<td class="pw"></td>
 			<td class="noborder">
-				<input type="submit" value="Passwort ändern">
+				<input type="submit" value="Passwort Ã¤ndern">
 			</td>
 		</tr>
 	</table>

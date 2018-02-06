@@ -82,18 +82,18 @@
   $( function() {
     $("#datepicker").datepicker({
 		defaultDate: +7,
-		clearText: 'löschen', clearStatus: 'aktuelles Datum löschen',
-		closeText: 'schließn', 
-		closeStatus: 'ohne Äderungen schließn',
-		prevText: '<zurück', 
+		clearText: 'lÃ¶schen', clearStatus: 'aktuelles Datum lÃ¶schen',
+		closeText: 'schlieÃŸen', 
+		closeStatus: 'ohne Ã„nderungen schlieÃŸen',
+		prevText: '<zurÃ¼ck', 
 		prevStatus: 'letzten Monat zeigen',
 		nextText: 'Vor>', 
-		nextStatus: 'nästen Monat zeigen',
+		nextStatus: 'nÃ¤chsten Monat zeigen',
 		currentText: 'heute', 
 		currentStatus: '',
-		monthNames: ['Januar','Februar','Mä','April','Mai','Juni',
+		monthNames: ['Januar','Februar','MÃ¤rz','April','Mai','Juni',
 		'Juli','August','September','Oktober','November','Dezember'],
-		monthNamesShort: ['Jan','Feb','Mär','Apr','Mai','Jun',
+		monthNamesShort: ['Jan','Feb','MÃ¤rz','Apr','Mai','Jun',
 		'Jul','Aug','Sep','Okt','Nov','Dez'],
 		monthStatus: 'anderen Monat anzeigen', 
 		yearStatus: 'anderes Jahr anzeigen',
@@ -103,10 +103,10 @@
 		dayNamesShort: ['So','Mo','Di','Mi','Do','Fr','Sa'],
 		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
 		dayStatus: 'Setze DD als ersten Wochentag',
-		dateStatus: 'Wähle D, M d',
+		dateStatus: 'WÃ¤hle D, M d',
 		dateFormat: "D' 'dd.mm.yy",
 		firstDay: 1, 
-		initStatus: 'Wähle ein Datum',
+		initStatus: 'WÃ¤hle ein Datum',
 		isRTL: false
 	});
 	if (new Date().getHours() < 19) {
@@ -127,5 +127,5 @@
 <form action="addplayer" method="post">
 	<input type="text" placeholder="Name" name="name" maxlength=20 />
 	<br />
-	<input type="submit" value="Neuen Spieler hinzufügen" />
+	<input type="submit" value="Neuen Spieler hinzufÃ¼gen" />
 </form>
