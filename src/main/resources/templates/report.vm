@@ -104,12 +104,12 @@
 		dayNamesMin: ['So','Mo','Di','Mi','Do','Fr','Sa'],
 		dayStatus: 'Setze DD als ersten Wochentag',
 		dateStatus: 'Wähle D, M d',
-		dateFormat: "D' 'dd.mm.yy",
+		dateFormat: "DD' 'dd.mm.yy",
 		firstDay: 1, 
 		initStatus: 'Wähle ein Datum',
 		isRTL: false
 	});
-	if (new Date().getHours() < 19) {
+	if (new Date().getHours() < 15) {
 		$("#datepicker").datepicker().datepicker("setDate", '-1d');
 	} else {
 		$("#datepicker").datepicker().datepicker("setDate", '0d');
