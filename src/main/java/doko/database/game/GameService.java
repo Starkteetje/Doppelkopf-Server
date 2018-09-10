@@ -8,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import doko.DokoConstants;
-import doko.database.player.Player;
-import doko.database.round.Round;
 import doko.lineup.LineUp;
 import doko.lineup.LineUpComparator;
 
@@ -64,10 +62,5 @@ public class GameService {
 	@Autowired
 	public void setGameRepository(GameRepository gameRepository) {
 		this.gameRepository = gameRepository;
-	}
-
-	public Game createGameFromRounds(List<Round> rounds, List<Player> players) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

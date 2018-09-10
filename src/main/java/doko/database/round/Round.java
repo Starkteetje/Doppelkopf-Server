@@ -43,16 +43,13 @@ public class Round {
 	private Long score4;
 
 	@Column(nullable = false)
-	private Long submitted;
-
-	@Column(nullable = false)
-	private Long gameId;
+	private String uniqueGameId;
 
 	@Column(nullable = false)
 	private Long gameRoundId;
 
 	public Round(Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
-			Long score4, Long submitted, Long gameId, Long gameRoundId) {
+			Long score4, String uniqueGameId, Long gameRoundId) {
 		this.player1 = player1;
 		this.score1 = score1;
 		this.player2 = player2;
@@ -61,17 +58,16 @@ public class Round {
 		this.score3 = score3;
 		this.player4 = player4;
 		this.score4 = score4;
-		this.submitted = submitted;
-		this.gameId = gameId;
+		this.uniqueGameId = uniqueGameId;
 		this.gameRoundId = gameRoundId;
 		// TODO validate
 	}
 
 	public Round(String player1, String score1, String player2, String score2, String player3, String score3,
-			String player4, String score4, Long submitted, String gameId, String gameRoundId) {
+			String player4, String score4, String uniqueGameId, String gameRoundId) {
 		this(new Long(player1), new Long(score1), new Long(player2), new Long(score2),
 				new Long(player3), new Long(score3), new Long(player4), new Long(score4),
-				submitted, new Long(gameId), new Long(gameRoundId));
+				uniqueGameId, new Long(gameRoundId));
 	}
 
 	public Round() {
@@ -107,8 +103,9 @@ public class Round {
 			return score2;
 		} else if (playerId.equals(player3)) {
 			return score3;
-		} else if (playerId.equals(player4))
+		} else if (playerId.equals(player4)) {
 			return score4;
+		}
 		return null;
 	}
 }

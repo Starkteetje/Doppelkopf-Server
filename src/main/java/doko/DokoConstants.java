@@ -12,8 +12,16 @@ public abstract class DokoConstants {
 	public static final String SESSION_SUCCESS_MESSAGE_ATTRIBUTE_NAME = "success";
 	public static final String SESSION_USER_ID_ATTRIBUTE_NAME = "user_id";
 
-	public static final String INPUT_DATE_FORMAT = "E dd.MM.yyyy";
+	public static final String INPUT_DATE_FORMAT_WEBSITE = "E dd.MM.yyyy";
+	public static final String INPUT_DATE_FORMAT_API = "YYYY-MM-dd";
 	public static final String OUTPUT_DATE_FORMAT = "dd.MM.yy";
+
+	public static final String API_PLAYERS_KEY = "players";
+	public static final String API_SCORE_FINAL_KEY = "final";
+	public static final String API_SCORE_VALUES_KEY = "points";
+	public static final String API_GAME_ID_KEY = "id";
+	public static final String API_DATE_KEY = "date";
+	public static final String API_PLAYER_NAME_KEY = "name";
 
 	public static final String ADD_GAME_PAGE_LOCATION = "/report";
 	public static final String ADD_PLAYER_PAGE_LOCATION = "/addplayer";

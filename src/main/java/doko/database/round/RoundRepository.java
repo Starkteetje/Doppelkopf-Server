@@ -12,5 +12,5 @@ public interface RoundRepository extends CrudRepository<Round, Long> {
 
 	List<Round> findByIdIn(List<Long> ids);
 
-	List<Round> findByGameId(Long gameId);
+	List<Round> findByUniqueGameId(String gameId);
 }

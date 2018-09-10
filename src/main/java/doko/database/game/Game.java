@@ -19,6 +19,9 @@ public class Game {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
+	@Column(nullable = true)
+	private String uniqueGameId = null;
+
 	@Column(nullable = false)
 	private Long player1;
 
@@ -49,8 +52,9 @@ public class Game {
 	@Column(nullable = false)
 	private Date date;
 
-	public Game(Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
+	public Game(String uniqueGameId, Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
 			Long score4, Long submitted, Date date) {
+		this.uniqueGameId = uniqueGameId;
 		this.player1 = player1;
 		this.score1 = score1;
 		this.player2 = player2;
@@ -62,10 +66,16 @@ public class Game {
 		this.submitted = submitted;
 		this.date = date;
 		// TODO validate
+		// TODO decide whether to accept empty entries (placeholder = 0) as 0
+	}
+
+	public Game(Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
+			Long score4, Long submitted, Date date) {
+		this(null, player1, score1, player2, score2, player3, score3, player4, score4, submitted, date);
 	}
 
 	public Game(String player1, String score1, String player2, String score2, String player3, String score3,
-			String player4, String score4, Long submitted, Date date) { //TODO decide whether to accept empty entries (placeholder = 0) as 0
+			String player4, String score4, Long submitted, Date date) {
 		this(new Long(player1), new Long(score1), new Long(player2), new Long(score2), new Long(player3),
 				new Long(score3), new Long(player4), new Long(score4), submitted, date);
 	}
@@ -75,6 +85,10 @@ public class Game {
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getUniqueId() {
+		return uniqueGameId;
 	}
 
 	public List<Long> getPlayerIds() {
@@ -103,8 +117,9 @@ public class Game {
 			return score2;
 		} else if (playerId.equals(player3)) {
 			return score3;
-		} else if (playerId.equals(player4))
+		} else if (playerId.equals(player4)) {
 			return score4;
+		}
 		return null;
 	}
 

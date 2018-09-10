@@ -13,11 +13,11 @@ public class RoundService {
 	private RoundRepository roundRepository;
 
 	public List<Round> getRounds(Game game) {
-		return getRounds(game.getId());
+		return getRoundsByUniqueGameId(game.getUniqueId());
 	}
 
-	public List<Round> getRounds(Long id) {
-		return roundRepository.findByGameId(id);
+	public List<Round> getRoundsByUniqueGameId(String id) {
+		return roundRepository.findByUniqueGameId(id);
 	}
 
 	public Round addRound(Round round) {

@@ -1,6 +1,7 @@
 package doko.rest;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
@@ -10,9 +11,12 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,12 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
 import doko.database.game.Game;
-import doko.database.player.Player;
 import doko.database.round.Round;
+import doko.database.round.RoundStruct;
 import doko.database.token.Token;
 import doko.database.user.User;
 import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
+import doko.util.JSONHandler;
 
 @RestController
 public class PostController extends RequestController {
@@ -77,36 +82,44 @@ public class PostController extends RequestController {
 		}
 	}
 
-	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST) //doesnt need CSRF prot now, because only send via app
-	public ResponseEntity<String> reportGameWithRounds(String someJSONThingy, String token) {
+	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	public ResponseEntity<String> reportGameWithRounds(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody RoundStruct roundStruct) {
+		String token = roundStruct.getToken();
+		JSONObject gameJSON = roundStruct.getJson();
 		if (tokenService.isTokenValid(token)) {
-			//TODO parse JSON
-			List<Round> rounds = parseJSONForRounds(someJSONThingy);
-			List<Player> players = parseJSONForPlayers(someJSONThingy);
-			Game game = gameService.createGameFromRounds(rounds, players);//TODO saving game gives gameId for Rounds
-			boolean roundsAdded = addRounds(rounds);
-			boolean gameAdded = addGame(game);
-			if (!gameAdded && !roundsAdded) {
-				//TODO
-			} else if (!gameAdded || !roundsAdded) {
-				//TODO
-			} else {
-				//TODO
+			List<Round> rounds;
+			Game game;
+			try {
+				JSONHandler jsonHandler = new JSONHandler(gameJSON, playerService, tokenService, token);
+				rounds = jsonHandler.getRounds();
+				game = jsonHandler.getGame();
+			} catch (JSONException | ParseException e) {
+				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO log
+			} catch (IOException e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
 			}
-			return new ResponseEntity<>(HttpStatus.OK); //TODO
+
+			try {
+				boolean gameAdded = addGame(game);
+				if (!gameAdded) {
+					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
+				} else {
+					boolean roundsAdded = addRounds(rounds);
+					if (!roundsAdded) {
+						//TODO log error, need to check
+						//TODO which status code?
+						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+					} else {
+						return new ResponseEntity<>(HttpStatus.OK);
+					}
+				}
+			} catch (Exception e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
+			}
 		} else {
-			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);//TODO log
 		}
-	}
-
-	private List<Player> parseJSONForPlayers(String someJSONThingy) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	private List<Round> parseJSONForRounds(String someJSONThingy) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	@RequestMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
@@ -119,7 +132,7 @@ public class PostController extends RequestController {
 		Optional<User> user = getLoggedInUser(request);
 		if (user.isPresent()) {
 			Long submitterId = user.get().getId();
-			SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT, Locale.GERMAN);
+			SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT_WEBSITE, Locale.GERMAN);
 			Game game;
 			try {
 				game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, sdf.parse(date));
@@ -185,7 +198,7 @@ public class PostController extends RequestController {
 		try {
 			response.sendRedirect(destination);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			//TODO log
 		}
 	}
 }

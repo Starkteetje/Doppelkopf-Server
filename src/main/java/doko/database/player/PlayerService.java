@@ -57,6 +57,11 @@ public class PlayerService {
 		}
 	}
 
+	public boolean existsPlayer(String playerName) {
+		Optional<Player> existingPlayer = getPlayerByName(playerName);
+		return existingPlayer.isPresent();
+	}
+
 	@Autowired
 	public void setPlayerRepository(PlayerRepository playerRepository) {
 		this.playerRepository = playerRepository;

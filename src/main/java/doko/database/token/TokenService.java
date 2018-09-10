@@ -23,6 +23,9 @@ public class TokenService {
 	}
 
 	public boolean isTokenValid(String tokenValue) {
+		if (tokenValue == null) {
+			return false;
+		}
 		List<Token> tokens = getAllTokens();
 		return tokens.stream().anyMatch(token -> token.getTokenValue().equals(tokenValue));
 	}
@@ -65,6 +68,15 @@ public class TokenService {
 
 	public Token saveToken(Token token) {//TODO look into why return value
 		return tokenRepository.save(token);
+	}
+
+	public Optional<Long> getUserIdOfToken(String tokenValue) {
+		Optional<Token> token = getTokenByValue(tokenValue);
+		if (token.isPresent()) {
+			return Optional.ofNullable(token.get().getUserId());
+		} else {
+			return Optional.empty();
+		}
 	}
 
 	@Autowired
