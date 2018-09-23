@@ -82,7 +82,7 @@ public class PostController extends RequestController {
 		}
 	}
 
-	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST)
 	public ResponseEntity<String> reportGameWithRounds(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody RoundStruct roundStruct) {
 		String token = roundStruct.getToken();

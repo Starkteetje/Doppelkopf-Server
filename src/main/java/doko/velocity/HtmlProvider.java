@@ -3,6 +3,7 @@ package doko.velocity;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -15,6 +16,7 @@ import doko.database.game.GameService;
 import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
+import doko.database.round.Round;
 import doko.database.user.User;
 import doko.lineup.NamedLineUp;
 
@@ -89,6 +91,30 @@ public class HtmlProvider {
 		context.put("dataPerSession", perSessionJSON);
 		context.put("ticks", ticksJSON);
 		context.put("rules", lineUpRules);
+		context.put(Double.class.getSimpleName(), Double.class);
+		context.put("doubleFormatter", new DecimalFormat("#.##"));
+		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
+
+		return ve.getFilledTemplate(context);
+	}
+
+	public String getGamePageHtml(String error, String success, List<Round> rounds, Date date) {
+		String gameHtml = getGameHtml(rounds, date);
+		return getPageHtml(error, success, gameHtml);
+	}
+
+	private String getGameHtml(List<Round> rounds, Date date) {
+		if (rounds.size() < 1) {
+			return "Kein solches Spiel vorhanden.";
+		}
+		// Template assumes that for all rounds the order of players is the same
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");
+
+		List<Player> players = playerService.getPlayers(rounds.get(0).getPlayerIds());
+		VelocityContext context = new VelocityContext();
+		context.put("date", date);
+		context.put("players", players);
+		context.put("rounds", rounds);
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));

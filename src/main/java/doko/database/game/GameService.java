@@ -2,6 +2,7 @@ package doko.database.game;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,10 @@ public class GameService {
 		return games.stream()
 				.filter(game -> game.getLineUp().equals(lineUp))
 				.collect(Collectors.toList());
+	}
+
+	public Optional<Game> getGameByUniqueId(String uniqueGameId) {
+		return Optional.ofNullable(gameRepository.findOneByUniqueGameId(uniqueGameId));
 	}
 
 	public Game addGame(Game game) {

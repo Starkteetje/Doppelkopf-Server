@@ -31,4 +31,5 @@ public abstract class DokoConstants {
 	public static final String LOGIN_PAGE_LOCATION = "/login";
 	public static final String LOGOUT_PAGE_LOCATION = "/logout";
 	public static final String PROFILE_PAGE_LOCATION = "/profile";
+	public static final String GAME_PAGE_LOCATION = "/game";
 }

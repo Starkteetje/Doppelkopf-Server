@@ -1,0 +1,96 @@
+<h1>Ergebnisse vom $dateFormatter.format($date)</h1>
+
+<table class="results">
+	<tr class="bigborder">
+		<td class="tablehead">Spieler</td>
+		#set ($scores = [])
+		#set ($lastPlayerIndex = $players.size() - 1)
+		#foreach ($player in $players)
+			<td class="tablehead"> $player.getName() </td>
+			#set ($add = $scores.add(0)) #*//disable output true*#
+		#end
+	</tr>
+
+	#set ($numberOfRounds = $rounds.size())
+	#set ($roundIndex = 0)
+	#foreach ($round in $rounds)
+		<tr>
+			#set ($roundScore = $rounds.get($roundIndex).getScores())
+			#set ($roundIndex = $roundIndex + 1)
+			<td>$roundIndex</td>
+			#foreach ($i in [0..$lastPlayerIndex])
+				#set ($score = $roundScore.get($i))
+				#set ($scores[$i] = $scores[$i] + $score)
+				<td>$score</td>
+			#end
+		</tr>
+	#end
+
+	<tr class="bigborder">
+		<td>Gesamtpunktzahl</td>
+		#foreach ($score in $scores)
+			<td> $score </td>
+		#end
+	</tr>
+
+	<tr class="bigborder">
+		<td>Durchschnitt</td>
+		#foreach ($score in $scores)
+			#set ($average = $Double.parseDouble($score.toString()) / $numberOfRounds)
+			<td> $doubleFormatter.format($average) </td>
+		#end
+	</tr>
+</table>
+
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart2);
+
+      function drawChart2() {
+        var dataPerSession = google.visualization.arrayToDataTable( $dataPerSession );
+
+        var optionsPerSession = {
+          title: 'Ergebnisse des jeweiligen Abends',
+          //curveType: 'function',
+          legend: { position: 'bottom' },
+		  pointSize: 7,
+		  pointShape: 'square',
+		  hAxis: {ticks: $ticks}
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('proAbend'));
+
+        chart.draw(dataPerSession, optionsPerSession);
+      }
+    </script>
+    <script type="text/javascript">
+      google.charts.setOnLoadCallback(drawChart1);
+
+      function drawChart1() {
+        var dataForAllSessions = google.visualization.arrayToDataTable( $dataForAllSessions );
+
+        var optionsForAllSessions = {
+          title: 'Ergebnisse aller Abende',
+          //curveType: 'function',
+          legend: { position: 'bottom' },
+		  pointSize: 7,
+		  pointShape: 'square',
+		  hAxis: {ticks: $ticks}
+        };
+
+        var chartForAllSessions = new google.visualization.LineChart(document.getElementById('alleAbende'));
+
+        chartForAllSessions.draw(dataForAllSessions, optionsForAllSessions);
+      }
+    </script>
+
+	<table class="noborder">
+		<tr class="noborder">
+			<td class="jshost"><div id="alleAbende"></div></td>
+		</tr>
+		<tr class="noborder">
+			<td class="jshost"><div id="proAbend"></div></td>
+		</tr>
+	</table>
+#end
