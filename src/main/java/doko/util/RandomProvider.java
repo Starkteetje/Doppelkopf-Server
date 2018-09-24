@@ -1,4 +1,4 @@
-package doko.random;
+package doko.util;
 
 import java.security.SecureRandom;
 

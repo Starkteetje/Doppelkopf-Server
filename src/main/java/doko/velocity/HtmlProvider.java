@@ -98,23 +98,28 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	public String getGamePageHtml(String error, String success, List<Round> rounds, Date date) {
-		String gameHtml = getGameHtml(rounds, date);
+	public String getGamePageHtml(String error, String success, NamedLineUp lineUp, List<Round> rounds, Date date) {
+		String gameHtml = getGameHtml(lineUp, rounds, date);
 		return getPageHtml(error, success, gameHtml);
 	}
 
-	private String getGameHtml(List<Round> rounds, Date date) {
+	private String getGameHtml(NamedLineUp lineUp, List<Round> rounds, Date date) {
 		if (rounds.size() < 1) {
-			return "Kein solches Spiel vorhanden.";
+			return "Unzureichende Daten für das Spiel. Erzeugung der Übersicht nicht möglich.";
 		}
 		// Template assumes that for all rounds the order of players is the same
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");
 
 		List<Player> players = playerService.getPlayers(rounds.get(0).getPlayerIds());
+		String allRoundsJson = getJsonForAllRoundsGraph(lineUp, rounds);
+		String perRoundJson = getJsonForPerRoundGraph(lineUp, rounds);
 		VelocityContext context = new VelocityContext();
 		context.put("date", date);
 		context.put("players", players);
 		context.put("rounds", rounds);
+		context.put("dataForAllRounds", allRoundsJson);
+		context.put("dataPerRound", perRoundJson);
+		context.put("ticks", getJSONForTicks(rounds));
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
@@ -160,8 +165,45 @@ public class HtmlProvider {
 		return gson.toJson(graphData);
 	}
 
-	private String getJSONForTicks(List<SortedGame> lineUpGames) {
-		int[] ticks = new int[lineUpGames.size() - 1];
+	private String getJsonForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
+		List<List<Object>> graphData = getGraphHeader(lineUp);
+
+		List<Long> previousScores = new ArrayList<>();
+		for (int i = 0; i < rounds.size(); i++) {
+			List<Object> gameData = new ArrayList<>();
+			gameData.add(i + 1);
+			List<Long> scores = rounds.get(i).getScores();
+
+			if (i == 0) {
+				gameData.addAll(scores);
+				previousScores = new ArrayList<>(scores);
+			} else {
+				for (int j = 0; j < scores.size(); j++) {
+					previousScores.set(j, scores.get(j) + previousScores.get(j));
+				}
+				gameData.addAll(previousScores);
+			}
+			graphData.add(gameData);
+		}
+		Gson gson = new Gson();
+		return gson.toJson(graphData);
+	}
+
+	private String getJsonForPerRoundGraph(NamedLineUp lineUp, List<Round> rounds) {
+		List<List<Object>> graphData = getGraphHeader(lineUp);
+
+		for (int i = 0; i < rounds.size(); i++) {
+			List<Object> gameData = new ArrayList<>();
+			gameData.add(i + 1);
+			gameData.addAll(rounds.get(i).getScores());
+			graphData.add(gameData);
+		}
+		Gson gson = new Gson();
+		return gson.toJson(graphData);
+	}
+
+	private <E> String getJSONForTicks(List<E> list) {
+		int[] ticks = new int[list.size() - 1];
 		for (int i = 0; i < ticks.length; i++) {
 			ticks[i] = i + 1;
 		}

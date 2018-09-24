@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import doko.database.user.User;
-import doko.random.RandomProvider;
+import doko.util.RandomProvider;
 
 @Service
 public class TokenService {

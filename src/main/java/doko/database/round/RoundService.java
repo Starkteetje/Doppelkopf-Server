@@ -1,6 +1,7 @@
 package doko.database.round;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +14,14 @@ public class RoundService {
 	private RoundRepository roundRepository;
 
 	public List<Round> getRounds(Game game) {
-		return getRoundsByUniqueGameId(game.getUniqueId());
+		return getRoundsByUniqueGameId(game.getUniqueGameId());
 	}
 
 	public List<Round> getRoundsByUniqueGameId(String id) {
-		return roundRepository.findByUniqueGameId(id);
+		return roundRepository.findAll().stream()
+				.filter(r -> r.getUniqueGameId().equals(id))
+				.sorted()
+				.collect(Collectors.toList());
 	}
 
 	public Round addRound(Round round) {

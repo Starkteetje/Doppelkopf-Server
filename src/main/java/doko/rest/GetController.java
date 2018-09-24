@@ -66,10 +66,11 @@ public class GetController extends RequestController {
 		}
 		Date date = game.get().getDate();
 		List<Round> rounds = roundService.getRoundsByUniqueGameId(gameId);
+		NamedLineUp lineUp = playerService.getNamedLineUp(new SortedGame(game.get()).getLineUp());
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
 		return new ResponseEntity<>(
-				velocity.getGamePageHtml(error, success, rounds, date), HttpStatus.OK);
+				velocity.getGamePageHtml(error, success, lineUp, rounds, date), HttpStatus.OK);
 	}
 
 	@GetMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, produces = "text/html")

@@ -12,7 +12,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "rounds")
-public class Round {
+public class Round implements Comparable<Round> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -107,5 +107,13 @@ public class Round {
 			return score4;
 		}
 		return null;
+	}
+
+	public String getUniqueGameId() {
+		return uniqueGameId;
+	}
+
+	public int compareTo(Round r) {
+		return this.gameRoundId.compareTo(r.gameRoundId);
 	}
 }

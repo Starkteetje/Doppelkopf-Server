@@ -9,8 +9,4 @@ import java.util.List;
 public interface RoundRepository extends CrudRepository<Round, Long> {
 
 	List<Round> findAll();
-
-	List<Round> findByIdIn(List<Long> ids);
-
-	List<Round> findByUniqueGameId(String gameId);
 }

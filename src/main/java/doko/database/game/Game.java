@@ -19,7 +19,7 @@ public class Game {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Column(nullable = true)
+	@Column(nullable = true, unique = true)
 	private String uniqueGameId = null;
 
 	@Column(nullable = false)
@@ -87,7 +87,7 @@ public class Game {
 		return id;
 	}
 
-	public String getUniqueId() {
+	public String getUniqueGameId() {
 		return uniqueGameId;
 	}
 
