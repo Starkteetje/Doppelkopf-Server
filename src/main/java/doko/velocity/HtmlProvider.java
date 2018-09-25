@@ -105,7 +105,7 @@ public class HtmlProvider {
 
 	private String getGameHtml(NamedLineUp lineUp, List<Round> rounds, Date date) {
 		if (rounds.size() < 1) {
-			return "Unzureichende Daten für das Spiel. Erzeugung der Übersicht nicht möglich.";
+			return "Unzureichende Daten fÃ¼r das Spiel. Erzeugung der Ãœbersicht nicht mÃ¶glich.";
 		}
 		// Template assumes that for all rounds the order of players is the same
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");

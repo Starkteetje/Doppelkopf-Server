@@ -13,7 +13,7 @@ public abstract class DokoConstants {
 	public static final String SESSION_USER_ID_ATTRIBUTE_NAME = "user_id";
 
 	public static final String INPUT_DATE_FORMAT_WEBSITE = "E dd.MM.yyyy";
-	public static final String INPUT_DATE_FORMAT_API = "YYYY-MM-dd";
+	public static final String INPUT_DATE_FORMAT_API = "yyyy-MM-dd";
 	public static final String OUTPUT_DATE_FORMAT = "dd.MM.yy";
 
 	public static final String API_PLAYERS_KEY = "players";

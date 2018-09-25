@@ -100,6 +100,11 @@ public class PostController extends RequestController {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
 			}
 
+			// Check whether game with that ID already exists
+			if (gameService.getGameByUniqueId(game.getUniqueGameId()).isPresent()) {
+				return new ResponseEntity<>(HttpStatus.CONFLICT);//TODO log
+			}
+
 			try {
 				boolean gameAdded = addGame(game);
 				if (!gameAdded) {
