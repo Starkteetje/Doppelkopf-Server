@@ -1,6 +1,7 @@
 <h1>Ergebnisse</h1>
 
 #if ($games.size() > 0)
+	#set ($baseLink = $roundUrl + "?id=")
 	#set ($players = $lineUp.getPlayers())
 	<table class="results">
 		<tr class="bigborder">
@@ -16,7 +17,11 @@
 		#set ($numberOfGames = $games.size())
 		#foreach ($game in $games)
 			<tr>
-				<td>$dateFormatter.format($game.getDate())</td>
+				#if ($game.getUniqueGameId() && $game.getUniqueGameId != "")
+					<td><a href="$baseLink$game.getUniqueGameId()">$dateFormatter.format($game.getDate())</a></td>
+				#else
+					<td>$dateFormatter.format($game.getDate())</td>
+				#end
 				#foreach ($i in [0..$lastPlayerIndex])
 					#set ($score = $game.getScores().get($i))
 					#set ($scores[$i] = $scores[$i] + $score)

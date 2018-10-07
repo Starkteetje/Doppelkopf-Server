@@ -86,7 +86,7 @@ public class HtmlProvider {
 		VelocityContext context = new VelocityContext();
 		context.put("lineUp", lineUp);
 		context.put("games", lineUpGames);
-		context.put("isMoney", isMoneyLineUp);
+		context.put("roundUrl", DokoConstants.GAME_PAGE_LOCATION);
 		context.put("dataForAllSessions", allSessionsJSON);
 		context.put("dataPerSession", perSessionJSON);
 		context.put("ticks", ticksJSON);
