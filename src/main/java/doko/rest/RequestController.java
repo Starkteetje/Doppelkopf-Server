@@ -114,7 +114,7 @@ public class RequestController {
 	public String getRules(LineUp lineUp) {
 		Optional<Rules> rules = rulesService.getRulesOfLineUp(lineUp);
 		if (rules.isPresent()) {
-			return rules.get().getRules();
+			return rules.get().getText();
 		}
 		return "";
 	}

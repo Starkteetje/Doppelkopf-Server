@@ -17,16 +17,17 @@ public class GameService {
 
 	private GameRepository gameRepository;
 
-	public List<SortedGame> getValidGames() {
+	public List<SortedGame> getValidGamesOrdered() {
 		List<Game> games = gameRepository.findAll();
 		return games.stream()
 				.map(SortedGame::new)
 				.filter(SortedGame::isValid) // TODO log invalid games -> DB inconsistency
+				.sorted((a, b) -> a.getDate().compareTo(b.getDate())) // Order games by their date
 				.collect(Collectors.toList());
 	}
 
 	public List<SortedGame> getGamesForLineUp(LineUp lineUp) {
-		List<SortedGame> games = getValidGames();
+		List<SortedGame> games = getValidGamesOrdered();
 		return games.stream()
 				.filter(game -> game.getLineUp().equals(lineUp))
 				.collect(Collectors.toList());
@@ -41,7 +42,7 @@ public class GameService {
 	}
 
 	public List<LineUp> getAllLineUps() {
-		List<SortedGame> games = getValidGames();
+		List<SortedGame> games = getValidGamesOrdered();
 		return games.stream()
 				.map(SortedGame::getLineUp)
 				.distinct()

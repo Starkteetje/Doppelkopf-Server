@@ -16,7 +16,7 @@ public class TokenService {
 	private TokenRepository tokenRepository;
 	private RandomProvider random = new RandomProvider();
 	private static final int TOKEN_LENGTH = 128;
-	private static final int VALIDITY_PERIOD_IN_MS = 1000 * 60 * 60 * 24 * 30;
+	private static final int VALIDITY_PERIOD_IN_MS = 1000 * 60 * 60 * 24 * 365; // Tokens will be valid for 1 year
 
 	public List<Token> getAllTokens() {
 		return tokenRepository.findAll();

@@ -126,15 +126,14 @@ public class GetController extends RequestController {
 		try {
 			response.sendRedirect("/");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO log
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/games")
 	public ResponseEntity<List<SortedGame>> getGames() {
-		return new ResponseEntity<>(gameService.getValidGames(), HttpStatus.OK);
+		return new ResponseEntity<>(gameService.getValidGamesOrdered(), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/players")

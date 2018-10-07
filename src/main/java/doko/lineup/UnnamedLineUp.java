@@ -2,7 +2,6 @@ package doko.lineup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class UnnamedLineUp extends LineUp {
@@ -17,7 +16,7 @@ public class UnnamedLineUp extends LineUp {
 		for (Long id : ids) {
 			this.ids.add(id);
 		}
-		this.ids.sort(nullComparator);
+		this.ids.sort(UnnamedLineUp::compare);
 		valid = isValid(this.ids);
 		lineUpString = getLineUpString(this.ids);
 	}
@@ -55,7 +54,7 @@ public class UnnamedLineUp extends LineUp {
 	}
 
 	protected static String getLineUpString(List<Long> ids) {
-		ids.sort(nullComparator);
+		ids.sort(UnnamedLineUp::compare);
 		return String.join(",", ids.stream().map(id -> id == null ? "-1" : id.toString()).toArray(String[]::new));
 	}
 
@@ -78,11 +77,9 @@ public class UnnamedLineUp extends LineUp {
 		return false;
 	}
 
-	private static Comparator<Long> nullComparator = new Comparator<Long>() {
-		public int compare(Long l1, Long l2) { // null < long
-			return l1 == null ? (l2 == null ? 0 : -1) : (l2 == null ? 1 : l1.compareTo(l2));
-		}
-	};
+	private static int compare(Long l1, Long l2) { // null < long
+		return l1 == null ? (l2 == null ? 0 : -1) : (l2 == null ? 1 : l1.compareTo(l2));
+	}
 
 	public int size() {
 		return ids.size();

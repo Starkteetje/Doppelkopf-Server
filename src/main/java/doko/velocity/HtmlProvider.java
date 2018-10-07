@@ -104,7 +104,7 @@ public class HtmlProvider {
 	}
 
 	private String getGameHtml(NamedLineUp lineUp, List<Round> rounds, Date date) {
-		if (rounds.size() < 1) {
+		if (rounds.isEmpty()) {
 			return "Unzureichende Daten für das Spiel. Erzeugung der Übersicht nicht möglich.";
 		}
 		// Template assumes that for all rounds the order of players is the same

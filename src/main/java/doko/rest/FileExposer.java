@@ -6,9 +6,9 @@ import java.nio.file.Paths;
 
 public class FileExposer {
 
-	private String CSS_PATH = "src/main/resources/css/"; // TODO change to target
-	private String IMAGE_PATH = "src/main/resources/images/"; // TODO change to target
-	private String JS_PATH = "src/main/resources/js/"; // TODO change to target
+	private static final String CSS_PATH = "src/main/resources/css/"; // TODO change to target
+	private static final String IMAGE_PATH = "src/main/resources/images/"; // TODO change to target
+	private static final String JS_PATH = "src/main/resources/js/"; // TODO change to target
 
 	private byte[] getFile(String path) {
 		try {

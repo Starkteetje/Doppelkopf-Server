@@ -25,17 +25,18 @@ import org.springframework.web.bind.annotation.RestController;
 import doko.DokoConstants;
 import doko.database.game.Game;
 import doko.database.round.Round;
-import doko.database.round.RoundStruct;
 import doko.database.token.Token;
 import doko.database.user.User;
 import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
 import doko.util.JSONHandler;
+import doko.util.LoginCredentialsStruct;
+import doko.util.RoundStruct;
 
 @RestController
 public class PostController extends RequestController {
 
-	@RequestMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, method = RequestMethod.POST) //TODO does this need protection from CSRF?
+	@RequestMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, method = RequestMethod.POST) //TODO needs protection from CSRF
 	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
 			@RequestParam(value = "remember_user", defaultValue = "false") String keepLoggedIn) {
@@ -44,20 +45,39 @@ public class PostController extends RequestController {
 			return ErrorPageController.getUnauthorizedPage();
 		}
 
-		String storedPw = user.get().getPassword();
-		Long userId = user.get().getId();
-		if (BCrypt.checkpw(password, storedPw)) {
-			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, userId);
+		String storedPassword = user.get().getPassword();
+		if (BCrypt.checkpw(password, storedPassword)) {
+			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, user.get().getId());
 
 			if (keepLoggedIn.equals("on")) {
 				Token token = tokenService.generateNewToken(user.get());
-				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());//TODO mark cookie as secure if HTTPS possible
-				rememberCookie.setMaxAge(60 * 60 * 24 * 30); // Cookie is stored for 30 days
+				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
+				//rememberCookie.setSecure(true); TODO
+				rememberCookie.setHttpOnly(true);
+				rememberCookie.setMaxAge(60 * 60 * 24 * 365); // Cookie is stored for 1 year
 				response.addCookie(rememberCookie);
 			}
 
 			redirectTo(response, DokoConstants.INDEX_PAGE_LOCATION);
 			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		return ErrorPageController.getUnauthorizedPage();
+	}
+
+	@RequestMapping(value = DokoConstants.API_LOGIN_LOCATION, method = RequestMethod.POST)
+	public ResponseEntity<String> getToken(HttpServletRequest request, HttpServletResponse response,
+			@RequestBody LoginCredentialsStruct credentials) {
+		String username = credentials.getUsername();
+		String password = credentials.getPassword();
+		Optional<User> user = userService.getUserByName(username);
+		if (!user.isPresent()) {
+			return ErrorPageController.getUnauthorizedPage();
+		}
+
+		String storedPassword = user.get().getPassword();
+		if (BCrypt.checkpw(password, storedPassword)) {
+			Token token = tokenService.generateNewToken(user.get());
+			return new ResponseEntity<>(token.getTokenValue(), HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
 	}
@@ -82,7 +102,7 @@ public class PostController extends RequestController {
 		}
 	}
 
-	@RequestMapping(value = DokoConstants.ADD_ROUNDS_PAGE_LOCATION, method = RequestMethod.POST)
+	@RequestMapping(value = DokoConstants.API_ADD_GAME_LOCATION, method = RequestMethod.POST)
 	public ResponseEntity<String> reportGameWithRounds(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody RoundStruct roundStruct) {
 		String token = roundStruct.getToken();
