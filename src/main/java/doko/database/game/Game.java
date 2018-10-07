@@ -19,7 +19,7 @@ public class Game {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Column(nullable = true)
+	@Column(nullable = true, unique = true)
 	private String uniqueGameId = null;
 
 	@Column(nullable = false)
@@ -47,13 +47,13 @@ public class Game {
 	private Long score4;
 
 	@Column(nullable = false)
-	private Long submitted;
+	private Long submitterId;
 
 	@Column(nullable = false)
 	private Date date;
 
 	public Game(String uniqueGameId, Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
-			Long score4, Long submitted, Date date) {
+			Long score4, Long submitterId, Date date) {
 		this.uniqueGameId = uniqueGameId;
 		this.player1 = player1;
 		this.score1 = score1;
@@ -63,21 +63,21 @@ public class Game {
 		this.score3 = score3;
 		this.player4 = player4;
 		this.score4 = score4;
-		this.submitted = submitted;
+		this.submitterId = submitterId;
 		this.date = date;
 		// TODO validate
 		// TODO decide whether to accept empty entries (placeholder = 0) as 0
 	}
 
 	public Game(Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
-			Long score4, Long submitted, Date date) {
-		this(null, player1, score1, player2, score2, player3, score3, player4, score4, submitted, date);
+			Long score4, Long submitterId, Date date) {
+		this(null, player1, score1, player2, score2, player3, score3, player4, score4, submitterId, date);
 	}
 
 	public Game(String player1, String score1, String player2, String score2, String player3, String score3,
-			String player4, String score4, Long submitted, Date date) {
+			String player4, String score4, Long submitterId, Date date) {
 		this(new Long(player1), new Long(score1), new Long(player2), new Long(score2), new Long(player3),
-				new Long(score3), new Long(player4), new Long(score4), submitted, date);
+				new Long(score3), new Long(player4), new Long(score4), submitterId, date);
 	}
 
 	public Game() {
@@ -87,8 +87,12 @@ public class Game {
 		return id;
 	}
 
-	public String getUniqueId() {
+	public String getUniqueGameId() {
 		return uniqueGameId;
+	}
+
+	public boolean hasRounds() { // Assumes only games with rounds set uniqueGameId
+		return uniqueGameId != null;
 	}
 
 	public List<Long> getPlayerIds() {

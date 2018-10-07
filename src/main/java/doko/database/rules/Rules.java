@@ -22,12 +22,12 @@ public class Rules implements Comparable<Rules> {
 	private Double version;
 
 	@Column(nullable = false)
-	private String rules;
+	private String text;
 
-	public Rules(String lineup, Double version, String rules) {
+	public Rules(String lineup, Double version, String text) {
 		this.lineup = lineup;
 		this.version = version;
-		this.rules = rules;
+		this.text = text;
 	}
 
 	public Rules() {
@@ -41,8 +41,8 @@ public class Rules implements Comparable<Rules> {
 		return version;
 	}
 
-	public String getRules() {
-		return rules;
+	public String getText() {
+		return text;
 	}
 
 	@Override

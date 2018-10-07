@@ -1,4 +1,4 @@
-package doko.database.round;
+package doko.util;
 
 import org.json.JSONObject;
 

@@ -1,6 +1,7 @@
 package doko.rest;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
+import doko.database.game.Game;
 import doko.database.game.SortedGame;
 import doko.database.player.Player;
+import doko.database.round.Round;
 import doko.database.user.User;
 import doko.lineup.LineUp;
 import doko.lineup.NamedLineUp;
@@ -48,6 +51,26 @@ public class GetController extends RequestController {
 		return new ResponseEntity<>(
 				velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames, isMoneyLineUp), HttpStatus.OK);
 
+	}
+
+	@GetMapping(value = DokoConstants.GAME_PAGE_LOCATION, produces = "text/html")
+	public ResponseEntity<String> displayGame(HttpServletRequest request,
+			@RequestParam(value = "id") String gameId) {
+		boolean isLoggedIn = isUserLoggedIn(request);
+		String error = consumeErrorMessage(request);
+		String success = consumeSuccessMessage(request);
+		Optional<Game> game = gameService.getGameByUniqueId(gameId);
+		if (!game.isPresent()) {
+			return new ResponseEntity<>(
+					"Spiel nicht vorhanden", HttpStatus.NOT_FOUND);
+		}
+		Date date = game.get().getDate();
+		List<Round> rounds = roundService.getRoundsByUniqueGameId(gameId);
+		NamedLineUp lineUp = playerService.getNamedLineUp(new SortedGame(game.get()).getLineUp());
+
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+		return new ResponseEntity<>(
+				velocity.getGamePageHtml(error, success, lineUp, rounds, date), HttpStatus.OK);
 	}
 
 	@GetMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, produces = "text/html")
@@ -103,15 +126,14 @@ public class GetController extends RequestController {
 		try {
 			response.sendRedirect("/");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			// TODO log
 		}
 		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/games")
 	public ResponseEntity<List<SortedGame>> getGames() {
-		return new ResponseEntity<>(gameService.getValidGames(), HttpStatus.OK);
+		return new ResponseEntity<>(gameService.getValidGamesOrdered(), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/players")

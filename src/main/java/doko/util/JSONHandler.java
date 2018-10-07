@@ -17,6 +17,7 @@ import doko.database.game.Game;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.round.Round;
+import doko.database.token.Token;
 import doko.database.token.TokenService;
 
 public class JSONHandler {
@@ -122,5 +123,12 @@ public class JSONHandler {
 			rounds.add(round);
 		}
 		return rounds;
+	}
+
+	public static String jsonify(Token token) {
+		JSONObject json = new JSONObject();
+		json.append("value", token.getTokenValue());
+		json.append("expiration_date", token.getExpirationDate());
+		return json.toString();
 	}
 }

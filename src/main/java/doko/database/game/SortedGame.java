@@ -13,12 +13,14 @@ public class SortedGame {
 	private List<Long> scores;
 	private boolean valid;
 	private Date date;
+	private String uniqueGameId;
 
 	public SortedGame(Game game) {
 		lineUp = new UnnamedLineUp(game.getPlayerIds());
 		scores = game.getScores();
 		valid = lineUp.isValid();
 		date = game.getDate();
+		uniqueGameId = game.getUniqueGameId();
 
 		for (int i = 0; i < lineUp.size(); i++) {
 			Long score = scores.get(i);
@@ -43,6 +45,10 @@ public class SortedGame {
 
 	public Date getDate() {
 		return date;
+	}
+
+	public String getUniqueGameId() {
+		return uniqueGameId;
 	}
 
 	public List<Object> getScoresWithDate() {

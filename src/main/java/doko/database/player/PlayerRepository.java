@@ -15,4 +15,6 @@ public interface PlayerRepository extends CrudRepository<Player, Long> {
 	List<Player> findByIdIn(List<Long> ids);
 
 	Player findOneByName(String playerName);
+
+	boolean existsByName(String playerName);
 }
