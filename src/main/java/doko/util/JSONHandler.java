@@ -1,6 +1,9 @@
 package doko.util;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -27,6 +30,7 @@ public class JSONHandler {
 	private TokenService tokenService;
 	private String token;
 	private boolean didAddPlayers = false;
+	private String uniqueGameId;
 
 	//TODO more transparency on adding users
 	public JSONHandler(JSONObject gameJson, PlayerService playerService, TokenService tokenService, String token) {
@@ -34,8 +38,17 @@ public class JSONHandler {
 		this.playerService = playerService;
 		this.tokenService = tokenService;
 		this.token = token;
+		// Generate a unique game id in order to prevent multiple uploads
+		MessageDigest md;
+		try {
+			md = MessageDigest.getInstance("SHA-256");
+			md.update(json.toString().getBytes(StandardCharsets.UTF_8));
+			uniqueGameId = toHex(md.digest());
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException("SHA-256 no longer supported. What?");
+		}
 	}
-	
+
 	private void addMissingPlayers() throws IOException {
 		for (int i = 0; i < json.getJSONArray(DokoConstants.API_PLAYERS_KEY).length(); i++) {
 			JSONObject playerJson = json.getJSONArray(DokoConstants.API_PLAYERS_KEY).getJSONObject(i);
@@ -52,7 +65,7 @@ public class JSONHandler {
 		}
 	}
 
-	public Game getGame() throws IOException, ParseException {
+	public Game getGame() throws IOException, ParseException, NoSuchAlgorithmException {
 		if (!didAddPlayers) {
 			addMissingPlayers();
 			didAddPlayers = true;
@@ -60,7 +73,6 @@ public class JSONHandler {
 
 		SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT_API, Locale.GERMAN);
 		Date date = sdf.parse(json.getString(DokoConstants.API_DATE_KEY));
-		String uniqueGameId = json.getString(DokoConstants.API_GAME_ID_KEY);
 
 		JSONObject player1Json = json.getJSONArray(DokoConstants.API_PLAYERS_KEY).getJSONObject(0);
 		Long player1Id = getPlayerId(player1Json.getString(DokoConstants.API_PLAYER_NAME_KEY));
@@ -113,13 +125,13 @@ public class JSONHandler {
 		JSONObject player4Json = json.getJSONArray(DokoConstants.API_PLAYERS_KEY).getJSONObject(3);
 		Long player4Id = getPlayerId(player4Json.getString(DokoConstants.API_PLAYER_NAME_KEY));
 		JSONArray points4 = player4Json.getJSONArray(DokoConstants.API_SCORE_VALUES_KEY);
-		
+
 		for (int i = 0; i < player1Json.getJSONArray(DokoConstants.API_SCORE_VALUES_KEY).length(); i++) {
 			Round round = new Round(player1Id, points1.getLong(i),
 					player2Id, points2.getLong(i),
 					player3Id, points3.getLong(i),
 					player4Id, points4.getLong(i),
-					json.getString(DokoConstants.API_GAME_ID_KEY), Long.valueOf(i));
+					uniqueGameId, Long.valueOf(i));
 			rounds.add(round);
 		}
 		return rounds;
@@ -130,5 +142,13 @@ public class JSONHandler {
 		json.append("value", token.getTokenValue());
 		json.append("expiration_date", token.getExpirationDate());
 		return json.toString();
+	}
+
+	private static String toHex(byte[] bytes) {
+		StringBuilder sb = new StringBuilder();
+		for (byte b : bytes) {
+			sb.append(String.format("%02X", b));
+		}
+		return sb.toString();
 	}
 }

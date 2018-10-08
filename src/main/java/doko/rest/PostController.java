@@ -1,6 +1,7 @@
 package doko.rest;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -114,7 +115,7 @@ public class PostController extends RequestController {
 				JSONHandler jsonHandler = new JSONHandler(gameJSON, playerService, tokenService, token);
 				rounds = jsonHandler.getRounds();
 				game = jsonHandler.getGame();
-			} catch (JSONException | ParseException e) {
+			} catch (JSONException | ParseException | NoSuchAlgorithmException e) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO log
 			} catch (IOException e) {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log

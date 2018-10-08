@@ -19,7 +19,6 @@ public abstract class DokoConstants {
 	public static final String API_PLAYERS_KEY = "players";
 	public static final String API_SCORE_FINAL_KEY = "final";
 	public static final String API_SCORE_VALUES_KEY = "points";
-	public static final String API_GAME_ID_KEY = "id";
 	public static final String API_DATE_KEY = "date";
 	public static final String API_PLAYER_NAME_KEY = "name";
 
