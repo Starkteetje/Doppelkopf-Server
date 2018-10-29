@@ -41,6 +41,10 @@ public class GameService {
 		return gameRepository.save(game);
 	}
 
+	public void delete(Game game) {
+		gameRepository.delete(game);
+	}
+
 	public List<LineUp> getAllLineUps() {
 		List<SortedGame> games = getValidGamesOrdered();
 		return games.stream()

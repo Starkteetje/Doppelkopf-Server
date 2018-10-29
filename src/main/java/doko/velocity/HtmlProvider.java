@@ -74,6 +74,9 @@ public class HtmlProvider {
 	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp,
 			String lineUpRules) {
 		VelocityTemplateHandler ve;
+		if (lineUpGames.isEmpty()) {
+			return "In dieser Besetzung wurde kein Spiel eingetragen. Erzeugung der Übersicht nicht möglich.";
+		}
 		if (isMoneyLineUp) {
 			ve = new VelocityTemplateHandler("templates/displayMoney.vm");
 		} else {

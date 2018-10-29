@@ -1,7 +1,6 @@
 package doko.rest;
 
 import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -17,9 +16,8 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,7 +35,7 @@ import doko.util.RoundStruct;
 @RestController
 public class PostController extends RequestController {
 
-	@RequestMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, method = RequestMethod.POST) //TODO needs protection from CSRF
+	@PostMapping(value = DokoConstants.LOGIN_PAGE_LOCATION) //TODO needs protection from CSRF
 	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
 			@RequestParam(value = "remember_user", defaultValue = "false") String keepLoggedIn) {
@@ -65,7 +63,7 @@ public class PostController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@RequestMapping(value = DokoConstants.API_LOGIN_LOCATION, method = RequestMethod.POST)
+	@PostMapping(value = DokoConstants.API_LOGIN_LOCATION)
 	public ResponseEntity<String> getToken(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody LoginCredentialsStruct credentials) {
 		String username = credentials.getUsername();
@@ -83,7 +81,7 @@ public class PostController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@RequestMapping(value = DokoConstants.PROFILE_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	@PostMapping(value = DokoConstants.PROFILE_PAGE_LOCATION) //TODO need protection from CSRF
 	public ResponseEntity<String> deleteAllLoginTokens(HttpServletRequest request, HttpServletResponse response) {
 		Optional<User> user = getLoggedInUser(request);
 		if (!user.isPresent()) {
@@ -103,7 +101,7 @@ public class PostController extends RequestController {
 		}
 	}
 
-	@RequestMapping(value = DokoConstants.API_ADD_GAME_LOCATION, method = RequestMethod.POST)
+	@PostMapping(value = DokoConstants.API_ADD_GAME_LOCATION)
 	public ResponseEntity<String> reportGameWithRounds(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody RoundStruct roundStruct) {
 		String token = roundStruct.getToken();
@@ -115,7 +113,7 @@ public class PostController extends RequestController {
 				JSONHandler jsonHandler = new JSONHandler(gameJSON, playerService, tokenService, token);
 				rounds = jsonHandler.getRounds();
 				game = jsonHandler.getGame();
-			} catch (JSONException | ParseException | NoSuchAlgorithmException e) {
+			} catch (JSONException | ParseException e) {
 				return new ResponseEntity<>(HttpStatus.BAD_REQUEST);//TODO log
 			} catch (IOException e) {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
@@ -126,29 +124,18 @@ public class PostController extends RequestController {
 				return new ResponseEntity<>(HttpStatus.CONFLICT);//TODO log
 			}
 
-			try {
-				boolean gameAdded = addGame(game);
-				if (!gameAdded) {
-					return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
-				} else {
-					boolean roundsAdded = addRounds(rounds);
-					if (!roundsAdded) {
-						//TODO log error, need to check
-						//TODO which status code?
-						return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-					} else {
-						return new ResponseEntity<>(HttpStatus.OK);
-					}
-				}
-			} catch (Exception e) {
-				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);//TODO log
+			boolean added = addGameAndRounds(game, rounds);
+			if (added) {
+				return new ResponseEntity<>(HttpStatus.OK);
+			} else {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} else {
 			return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);//TODO log
 		}
 	}
 
-	@RequestMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	@PostMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION) //TODO need protection from CSRF
 	public ResponseEntity<String> reportGame(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "id1") String id1,
 			@RequestParam(value = "id2") String id2, @RequestParam(value = "id3") String id3,
@@ -182,6 +169,22 @@ public class PostController extends RequestController {
 		}
 	}
 
+	private boolean addGameAndRounds(Game game, Iterable<Round> rounds) {
+		boolean gameAdded = addGame(game);
+		if (!gameAdded) {
+			return false; //TODO log
+		} else {
+			boolean roundsAdded = addRounds(rounds);
+			if (!roundsAdded) {
+				gameService.delete(game); // Delete game to ensure consistency
+				//TODO log
+				return false;
+			} else {
+				return true;
+			}
+		}
+	}
+
 	private boolean addGame(Game game) {
 		game = gameService.addGame(game);
 		//Check whether game was added
@@ -201,7 +204,7 @@ public class PostController extends RequestController {
 		return true;
 	}
 
-	@RequestMapping(value = DokoConstants.ADD_PLAYER_PAGE_LOCATION, method = RequestMethod.POST) //TODO need protection from CSRF
+	@PostMapping(value = DokoConstants.ADD_PLAYER_PAGE_LOCATION) //TODO need protection from CSRF
 	public ResponseEntity<String> addPlayer(HttpServletRequest request,
 			HttpServletResponse response, @RequestParam(value = "name") String playerName) {
 		if (isUserLoggedIn(request)) {

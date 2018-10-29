@@ -65,7 +65,7 @@ public class JSONHandler {
 		}
 	}
 
-	public Game getGame() throws IOException, ParseException, NoSuchAlgorithmException {
+	public Game getGame() throws IOException, ParseException {
 		if (!didAddPlayers) {
 			addMissingPlayers();
 			didAddPlayers = true;

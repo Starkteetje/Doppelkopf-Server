@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -112,7 +110,7 @@ public class GetController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@RequestMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION, method = RequestMethod.GET)
+	@GetMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION)
 	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//changes server stuff, so move to post. also CSRF
 		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
 		Cookie storedCookie = getRememberCookie(request);

@@ -77,8 +77,18 @@ public class UnnamedLineUp extends LineUp {
 		return false;
 	}
 
-	private static int compare(Long l1, Long l2) { // null < long
-		return l1 == null ? (l2 == null ? 0 : -1) : (l2 == null ? 1 : l1.compareTo(l2));
+	private static int compare(Long l1, Long l2) {
+		if (l1 == null) {
+			if (l2 == null) {
+				return 0; // null == null
+			} else {
+				return -1; // null < Long
+			}
+		} else if (l2 == null) {
+			return 1; // Long > null
+		} else {
+			return l1.compareTo(l2);
+		}
 	}
 
 	public int size() {

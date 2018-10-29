@@ -60,7 +60,6 @@ public class Round implements Comparable<Round> {
 		this.score4 = score4;
 		this.uniqueGameId = uniqueGameId;
 		this.gameRoundId = gameRoundId;
-		// TODO validate
 	}
 
 	public Round(String player1, String score1, String player2, String score2, String player3, String score3,
@@ -115,5 +114,17 @@ public class Round implements Comparable<Round> {
 
 	public int compareTo(Round r) {
 		return this.gameRoundId.compareTo(r.gameRoundId);
+	}
+
+	public boolean equals(Object r) {
+		if (r instanceof Round) {
+			return uniqueGameId == ((Round) r).uniqueGameId && gameRoundId == ((Round) r).gameRoundId;
+		} else {
+			return false;
+		}
+	}
+
+	public int hashCode() {
+		return uniqueGameId.hashCode() + gameRoundId.intValue();
 	}
 }
