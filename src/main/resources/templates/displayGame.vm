@@ -45,29 +45,9 @@
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <script type="text/javascript">
   google.charts.load('current', {'packages':['corechart']});
-  google.charts.setOnLoadCallback(drawChart2);
+  google.charts.setOnLoadCallback(drawChart);
 
-  function drawChart2() {
-	var dataPerSession = google.visualization.arrayToDataTable( $dataPerRound );
-
-	var optionsPerSession = {
-	  title: 'Punkte der Runde',
-	  //curveType: 'function',
-	  legend: { position: 'bottom' },
-	  pointSize: 7,
-	  pointShape: 'square',
-	  hAxis: {ticks: $ticks}
-	};
-
-	var chart = new google.visualization.LineChart(document.getElementById('proRunde'));
-
-	chart.draw(dataPerSession, optionsPerSession);
-  }
-</script>
-<script type="text/javascript">
-  google.charts.setOnLoadCallback(drawChart1);
-
-  function drawChart1() {
+  function drawChart() {
 	var dataForAllSessions = google.visualization.arrayToDataTable( $dataForAllRounds );
 
 	var optionsForAllSessions = {
@@ -88,8 +68,5 @@
 <table class="noborder">
 	<tr class="noborder">
 		<td class="jshost"><div id="verlauf"></div></td>
-	</tr>
-	<tr class="noborder">
-		<td class="jshost"><div id="proRunde"></div></td>
 	</tr>
 </table>

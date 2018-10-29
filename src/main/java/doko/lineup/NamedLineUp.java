@@ -19,8 +19,7 @@ public class NamedLineUp extends LineUp {
 		ids = lineUp.getIds();
 		lineUpString = lineUp.getLineUpString();
 		valid = lineUp.isValid();
-		players = playerService.getPlayers(ids);
-		players.sort(null); // Sorting players in their defined order is necessary to assure that players are in the same order as the ids
+		players = playerService.getPlayersSortedById(ids);
 		List<String> shortNames = players.stream()
 				.map(Player::getName)
 				.map(NamedLineUp::subStringOfN)

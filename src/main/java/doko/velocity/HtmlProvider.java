@@ -108,12 +108,11 @@ public class HtmlProvider {
 
 	private String getGameHtml(NamedLineUp lineUp, List<Round> rounds, Date date) {
 		if (rounds.isEmpty()) {
-			return "Unzureichende Daten für das Spiel. Erzeugung der Übersicht nicht möglich.";
+			return "Keine Runden für dieses Spiel eingetragen. Erzeugung der Übersicht nicht möglich.";
 		}
 		// Template assumes that for all rounds the order of players is the same
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");
-
-		List<Player> players = playerService.getPlayers(rounds.get(0).getPlayerIds());
+		List<Player> players = playerService.getPlayersSortedById(rounds.get(0).getPlayerIds());
 		String allRoundsJson = getJsonForAllRoundsGraph(lineUp, rounds);
 		String perRoundJson = getJsonForPerRoundGraph(lineUp, rounds);
 		VelocityContext context = new VelocityContext();

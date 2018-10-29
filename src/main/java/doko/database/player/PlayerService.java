@@ -24,8 +24,10 @@ public class PlayerService {
 		return Optional.ofNullable(playerRepository.findOne(id));
 	}
 
-	public List<Player> getPlayers(List<Long> ids) {
-		return playerRepository.findByIdIn(ids);
+	public List<Player> getPlayersSortedById(List<Long> ids) {
+		List<Player> players = playerRepository.findByIdIn(ids);
+		players.sort(null);
+		return players;
 	}
 
 	public Optional<Player> getPlayerByName(String playerName) {
