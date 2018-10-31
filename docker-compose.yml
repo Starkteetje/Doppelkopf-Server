@@ -1,0 +1,25 @@
+version: '3'
+services:
+  db:
+    container_name: "mysql-doko-container"
+    restart: "always"
+    image: "mysql:5.7"
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+        MYSQL_ROOT_PASSWORD: "SomePassword"
+        MYSQL_DATABASE: "dokodb"
+    volumes:
+      - ./init-data:/docker-entrypoint-initdb.d
+  web:
+    container_name: "doko-server-container"
+    build:
+        context: .
+        dockerfile: "Dockerfile"
+    links:
+        - db:Mysql
+    depends_on:
+        - db
+    expose:
+        - "80"
+    ports:
+     - "80:80"
