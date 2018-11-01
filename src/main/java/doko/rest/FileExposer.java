@@ -1,20 +1,22 @@
 package doko.rest;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
 
 public class FileExposer {
 
-	private static final String CSS_PATH = "src/main/resources/css/"; // TODO change to target
-	private static final String IMAGE_PATH = "src/main/resources/images/"; // TODO change to target
-	private static final String JS_PATH = "src/main/resources/js/"; // TODO change to target
+	private static final String CSS_PATH = "BOOT-INF/classes/css/";
+	private static final String IMAGE_PATH = "BOOT-INF/classes/images/";
+	private static final String JS_PATH = "BOOT-INF/classes/js/";
 
 	private byte[] getFile(String path) {
 		try {
-			//TODO log all file system access
-			return Files.readAllBytes(Paths.get(path));
+			InputStream is = this.getClass().getClassLoader().getResourceAsStream(path);
+			return IOUtils.toByteArray(is);
 		} catch (IOException e) {
+			System.out.println("Could not read file " + path); //TODO log properly
 			return new byte[0];
 		}
 	}
