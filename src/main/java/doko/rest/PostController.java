@@ -16,10 +16,10 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
 import doko.database.game.Game;
@@ -32,7 +32,7 @@ import doko.util.JSONHandler;
 import doko.util.LoginCredentialsStruct;
 import doko.util.RoundStruct;
 
-@RestController
+@Controller
 public class PostController extends RequestController {
 
 	@PostMapping(value = DokoConstants.LOGIN_PAGE_LOCATION) //TODO needs protection from CSRF
@@ -51,7 +51,7 @@ public class PostController extends RequestController {
 			if (keepLoggedIn.equals("on")) {
 				Token token = tokenService.generateNewToken(user.get());
 				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
-				//rememberCookie.setSecure(true); TODO
+				rememberCookie.setSecure(true);
 				rememberCookie.setHttpOnly(true);
 				rememberCookie.setMaxAge(60 * 60 * 24 * 365); // Cookie is stored for 1 year
 				response.addCookie(rememberCookie);

@@ -20,6 +20,6 @@ services:
     depends_on:
         - db
     expose:
-        - "80"
+        - "443"
     ports:
-     - "80:80"
+     - "443:443"

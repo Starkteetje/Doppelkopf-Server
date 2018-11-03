@@ -2,10 +2,11 @@ package doko.rest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class AdditionalResourceController {
+public class AdditionalResourceController extends DokoController {
 
 	private FileExposer fileExposer = new FileExposer();
 
@@ -44,13 +45,28 @@ public class AdditionalResourceController {
 		return new ResponseEntity<>(fileExposer.getDatepickerUiCSS(), HttpStatus.OK);
 	}
 
+	@GetMapping(value = "/notification.js", produces = "application/javascript")
+	public ResponseEntity<byte[]> getNotificationJS() {
+		return new ResponseEntity<>(fileExposer.getNotificationJS(), HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/datepicker1.js", produces = "application/javascript")
-	public ResponseEntity<byte[]> getJS1() {
-		return new ResponseEntity<>(fileExposer.getJS1(), HttpStatus.OK);
+	public ResponseEntity<byte[]> getDatepickerJS1() {
+		return new ResponseEntity<>(fileExposer.getDatePickerJS1(), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/datepicker2.js", produces = "application/javascript")
-	public ResponseEntity<byte[]> getJS2() {
-		return new ResponseEntity<>(fileExposer.getJS2(), HttpStatus.OK);
+	public ResponseEntity<byte[]> getDatePickerJS2() {
+		return new ResponseEntity<>(fileExposer.getDatePickerJS2(), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/session.js", produces = "application/javascript")
+	public ResponseEntity<byte[]> getSessionGraphJS() {
+		return new ResponseEntity<>(fileExposer.getSessionGraphJS(), HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/evening.js", produces = "application/javascript")
+	public ResponseEntity<byte[]> getEveningGraphJS() {
+		return new ResponseEntity<>(fileExposer.getEveningGraphJS(), HttpStatus.OK);
 	}
 }

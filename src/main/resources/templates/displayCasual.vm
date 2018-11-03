@@ -46,48 +46,9 @@
 		</tr>
 	</table>
 
+	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" style="hidden" />
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-      google.charts.load('current', {'packages':['corechart']});
-      google.charts.setOnLoadCallback(drawChart2);
-
-      function drawChart2() {
-        var dataPerSession = google.visualization.arrayToDataTable( $dataPerSession );
-
-        var optionsPerSession = {
-          title: 'Ergebnisse des jeweiligen Abends',
-          //curveType: 'function',
-          legend: { position: 'bottom' },
-		  pointSize: 7,
-		  pointShape: 'square',
-		  hAxis: {ticks: $ticks}
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('proAbend'));
-
-        chart.draw(dataPerSession, optionsPerSession);
-      }
-    </script>
-    <script type="text/javascript">
-      google.charts.setOnLoadCallback(drawChart1);
-
-      function drawChart1() {
-        var dataForAllSessions = google.visualization.arrayToDataTable( $dataForAllSessions );
-
-        var optionsForAllSessions = {
-          title: 'Ergebnisse aller Abende',
-          //curveType: 'function',
-          legend: { position: 'bottom' },
-		  pointSize: 7,
-		  pointShape: 'square',
-		  hAxis: {ticks: $ticks}
-        };
-
-        var chartForAllSessions = new google.visualization.LineChart(document.getElementById('alleAbende'));
-
-        chartForAllSessions.draw(dataForAllSessions, optionsForAllSessions);
-      }
-    </script>
+    <script type="text/javascript" src="session.js"></script>
 
 	<table class="noborder">
 		<tr class="noborder">

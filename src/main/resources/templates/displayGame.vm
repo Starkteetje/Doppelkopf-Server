@@ -41,29 +41,10 @@
 		#end
 	</tr>
 </table>
+<div id="data" data-ticks="$ticks" data-rounddata="$dataForAllRounds" style="hidden" />
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<script type="text/javascript">
-  google.charts.load('current', {'packages':['corechart']});
-  google.charts.setOnLoadCallback(drawChart);
-
-  function drawChart() {
-	var dataForAllSessions = google.visualization.arrayToDataTable( $dataForAllRounds );
-
-	var optionsForAllSessions = {
-	  title: 'Punkteverlauf des Abends',
-	  //curveType: 'function',
-	  legend: { position: 'bottom' },
-	  pointSize: 7,
-	  pointShape: 'square',
-	  hAxis: {ticks: $ticks}
-	};
-
-	var chartForAllSessions = new google.visualization.LineChart(document.getElementById('verlauf'));
-
-	chartForAllSessions.draw(dataForAllSessions, optionsForAllSessions);
-  }
-</script>
+<script type="text/javascript" src="evening.js"></script>
 
 <table class="noborder">
 	<tr class="noborder">

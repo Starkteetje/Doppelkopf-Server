@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-public class ErrorPageController extends AbstractErrorController implements ErrorController {
+public class ErrorPageController extends AbstractErrorController implements ErrorController { //TODO extend DokoController for sec headers
 
 	public ErrorPageController(ErrorAttributes errorAttributes) {
 		super(errorAttributes);

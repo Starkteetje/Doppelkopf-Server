@@ -9,6 +9,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import doko.DokoConstants;
 import doko.database.game.GameService;
 import doko.database.game.SortedGame;
@@ -25,7 +26,7 @@ import doko.lineup.LineUp;
 import doko.lineup.NamedLineUp;
 import doko.lineup.UnnamedLineUp;
 
-public class RequestController {
+public class RequestController extends DokoController {
 
 	@Autowired
 	protected GameService gameService;

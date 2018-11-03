@@ -45,12 +45,24 @@ public class FileExposer {
 		return getImage("task.png");
 	}
 
-	public byte[] getJS1() {
+	public byte[] getNotificationJS() {
+		return getJS("notification.js");
+	}
+
+	public byte[] getDatePickerJS1() {
 		return getJS("datepicker1.js");
 	}
 
-	public byte[] getJS2() {
+	public byte[] getDatePickerJS2() {
 		return getJS("datepicker2.js");
+	}
+
+	public byte[] getEveningGraphJS() {
+		return getJS("evening.js");
+	}
+
+	public byte[] getSessionGraphJS() {
+		return getJS("session.js");
 	}
 
 	public byte[] getMainCSS() {

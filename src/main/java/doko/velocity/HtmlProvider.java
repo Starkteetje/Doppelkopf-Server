@@ -3,6 +3,7 @@ package doko.velocity;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -83,8 +84,8 @@ public class HtmlProvider {
 			ve = new VelocityTemplateHandler("templates/displayCasual.vm");
 		}
 
-		String allSessionsJSON = getJSONForAllSessionsGraph(lineUp, lineUpGames);
-		String perSessionJSON = getJSONForPerSessionGraph(lineUp, lineUpGames);
+		String allSessionsJSON = getEncodedJSONForAllSessionsGraph(lineUp, lineUpGames);
+		String perSessionJSON = getEncodedJSONForPerSessionGraph(lineUp, lineUpGames);
 		String ticksJSON = getJSONForTicks(lineUpGames);
 		VelocityContext context = new VelocityContext();
 		context.put("lineUp", lineUp);
@@ -113,14 +114,12 @@ public class HtmlProvider {
 		// Template assumes that for all rounds the order of players is the same
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");
 		List<Player> players = playerService.getPlayersSortedById(rounds.get(0).getPlayerIds());
-		String allRoundsJson = getJsonForAllRoundsGraph(lineUp, rounds);
-		String perRoundJson = getJsonForPerRoundGraph(lineUp, rounds);
+		String allRoundsJson = getEncodedJsonForAllRoundsGraph(lineUp, rounds);
 		VelocityContext context = new VelocityContext();
 		context.put("date", date);
 		context.put("players", players);
 		context.put("rounds", rounds);
 		context.put("dataForAllRounds", allRoundsJson);
-		context.put("dataPerRound", perRoundJson);
 		context.put("ticks", getJSONForTicks(rounds));
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
@@ -129,7 +128,7 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	private String getJSONForAllSessionsGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
+	private String getEncodedJSONForAllSessionsGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
 		List<List<Object>> graphData = getGraphHeader(lineUp);
 
 		List<Long> previousScores = new ArrayList<>();
@@ -150,11 +149,11 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return gson.toJson(graphData);
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
 	}
 
 
-	private String getJSONForPerSessionGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
+	private String getEncodedJSONForPerSessionGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
 		List<List<Object>> graphData = getGraphHeader(lineUp);
 
 		for (int i = 0; i < lineUpGames.size(); i++) {
@@ -164,10 +163,10 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return gson.toJson(graphData);
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
 	}
 
-	private String getJsonForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
+	private String getEncodedJsonForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
 		List<List<Object>> graphData = getGraphHeader(lineUp);
 
 		List<Long> previousScores = new ArrayList<>();
@@ -188,20 +187,7 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return gson.toJson(graphData);
-	}
-
-	private String getJsonForPerRoundGraph(NamedLineUp lineUp, List<Round> rounds) {
-		List<List<Object>> graphData = getGraphHeader(lineUp);
-
-		for (int i = 0; i < rounds.size(); i++) {
-			List<Object> gameData = new ArrayList<>();
-			gameData.add(i + 1);
-			gameData.addAll(rounds.get(i).getScores());
-			graphData.add(gameData);
-		}
-		Gson gson = new Gson();
-		return gson.toJson(graphData);
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
 	}
 
 	private <E> String getJSONForTicks(List<E> list) {

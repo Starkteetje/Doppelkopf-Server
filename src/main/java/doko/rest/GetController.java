@@ -11,9 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
 import doko.DokoConstants;
 import doko.database.game.Game;
@@ -26,7 +26,7 @@ import doko.lineup.NamedLineUp;
 import doko.lineup.UnnamedLineUp;
 import doko.velocity.HtmlProvider;
 
-@RestController
+@Controller
 public class GetController extends RequestController {
 
 	@GetMapping(value = DokoConstants.INDEX_PAGE_LOCATION, produces = "text/html")
