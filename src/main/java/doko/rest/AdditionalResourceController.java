@@ -50,7 +50,7 @@ public class AdditionalResourceController extends DokoController {
 		return new ResponseEntity<>(fileExposer.getNotificationJS(), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "datepickerconfig.js", produces = "application/javascript")
+	@GetMapping(value = "/datepickerconfig.js", produces = "application/javascript")
 	public ResponseEntity<byte[]> getDatePickerConfig() {
 		return new ResponseEntity<>(fileExposer.getDatePickerConfigJS(), HttpStatus.OK);
 	}

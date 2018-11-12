@@ -35,6 +35,12 @@ import doko.util.RoundStruct;
 @Controller
 public class PostController extends RequestController {
 
+	@PostMapping(value = "/reportcsp")
+	public void reportCSPViolation(HttpServletRequest request, HttpServletResponse response, @RequestBody String body) {
+		System.out.println(body);
+		//TODO logging
+	}
+
 	@PostMapping(value = DokoConstants.LOGIN_PAGE_LOCATION) //TODO needs protection from CSRF
 	public ResponseEntity<String> loginUser(HttpServletRequest request, HttpServletResponse response, 
 			@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
