@@ -49,6 +49,10 @@ public class FileExposer {
 		return getJS("notification.js");
 	}
 
+	public byte[] getDatePickerConfigJS() {
+		return getJS("datepickerconfig.js");
+	}
+
 	public byte[] getDatePickerJS1() {
 		return getJS("datepicker1.js");
 	}

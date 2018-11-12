@@ -36,12 +36,12 @@ public class AdditionalResourceController extends DokoController {
 	}
 
 	@GetMapping(value = "/datepicker", produces = "text/css")
-	public ResponseEntity<byte[]> getDatepickerCSS() {
+	public ResponseEntity<byte[]> getDatePickerCSS() {
 		return new ResponseEntity<>(fileExposer.getDatepickerCSS(), HttpStatus.OK);
 	}
 
 	@GetMapping(value = "/datepicker-ui", produces = "text/css")
-	public ResponseEntity<byte[]> getDatepickerUiCSS() {
+	public ResponseEntity<byte[]> getDatePickerUiCSS() {
 		return new ResponseEntity<>(fileExposer.getDatepickerUiCSS(), HttpStatus.OK);
 	}
 
@@ -50,8 +50,13 @@ public class AdditionalResourceController extends DokoController {
 		return new ResponseEntity<>(fileExposer.getNotificationJS(), HttpStatus.OK);
 	}
 
+	@GetMapping(value = "datepickerconfig.js", produces = "application/javascript")
+	public ResponseEntity<byte[]> getDatePickerConfig() {
+		return new ResponseEntity<>(fileExposer.getDatePickerConfigJS(), HttpStatus.OK);
+	}
+
 	@GetMapping(value = "/datepicker1.js", produces = "application/javascript")
-	public ResponseEntity<byte[]> getDatepickerJS1() {
+	public ResponseEntity<byte[]> getDatePickerJS1() {
 		return new ResponseEntity<>(fileExposer.getDatePickerJS1(), HttpStatus.OK);
 	}
 
