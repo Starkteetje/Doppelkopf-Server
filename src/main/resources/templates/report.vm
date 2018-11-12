@@ -75,9 +75,9 @@
 </table>
   <link rel="stylesheet" href="datepicker-ui.css">
   <link rel="stylesheet" href="datepicker.css">
-  <script src="datepicker2.js"></script>
-  <script src="datepicker1.js"></script>
-  <script src="datepickerconfig.js"></script>
+  <script src="datepicker2.js" integrity="sha384-uxADUXLepwdwcmsbGoTdJf/061RYupCtyzCGnHW+p+H6bmt1WmsYsT1jzUSpqAJf" crossorigin="anonymous"></script>
+  <script src="datepicker1.js" integrity="sha384-0XNqfwgC08nVDp2EyNswGQRQRWbHb/fL1MqA0nOPrUI/eKOwb17NXpS0EZPrWtfL" crossorigin="anonymous"></script>
+  <script src="datepickerconfig.js" integrity="sha384-RjiaAwVzBSVWD5j94j+eLhi6IjRHTmxufz/kGKIcm1uQIKmpRSYbUsmbP/RIu2Rz" crossorigin="anonymous"></script>
 <p>Datum: <input type="text" id="datepicker" name="date"></p>
 <input type="submit" value="Ergebnisse speichern" />
 

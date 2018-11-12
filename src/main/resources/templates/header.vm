@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="de">
 	<head>
 		<meta charset="UTF-8">
 		<title>Doko-Seite</title>
-		<link rel="stylesheet" type="text/css" href="style"/> 
+		<link rel="stylesheet" type="text/css" href="style" integrity="sha384-4oFUTinMc12OPStgvMnNm5x49z1s/CZ98FbQw4R2o6q6HVHOndN86A2ItIM/q5OK" crossorigin="anonymous"/>
 	</head>
 
 	<body>
@@ -18,7 +19,7 @@
 			  <li class="left"><div class="dropDown">Weitere Runden<ul class="vertical">
 			  #foreach ($lineUp in $nonTopLineUps)
 				#if ($lineUp.getLineUpString() != "1,2,3,4")
-			  		<li class=\"left\"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName()</a></li>
+			  		<li class="left"><a href="lineup?lineup=$lineUp.getLineUpString() "> $lineUp.getLineUpName()</a></li>
 				#end
 			  #end
 			  </ul></div></li>
@@ -46,4 +47,4 @@
 				#end
 			</div>
 
-		<script type="text/javascript" src="notification.js"></script>
+		<script type="text/javascript" src="notification.js" integrity="sha384-CNSDIfbHVDzESinIxAgk5GfV71N8xS/d32nvxWpDzzRhKvN6yzk4UenK5O+ppaoU" crossorigin="anonymous"></script>

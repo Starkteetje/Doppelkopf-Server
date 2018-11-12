@@ -66,16 +66,16 @@
 		</tr>
 
 		<tr class="bigborder">
-			<td class=\"noborder\">Betrag</td>
+			<td class="noborder">Betrag</td>
 			#foreach ($penalty in $penalties)
 				<td> $doubleFormatter.format($penalty)&euro; </td>
 			#end
 		</tr>
 	</table>
 
-	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" style="hidden" />
+	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" style="hidden"></div>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="session.js"></script>
+    <script type="text/javascript" src="session.js" integrity="sha384-0Z/3uiwGbuuZAYV7deipFAxJXyIlgniyUnScOA0VLFOD3ibSORWOgrvjA/IVGG4R" crossorigin="anonymous"></script>
 
 	<table class="noborder">
 		<tr class="noborder">
