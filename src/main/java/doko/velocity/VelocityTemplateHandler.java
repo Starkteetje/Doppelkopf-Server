@@ -17,7 +17,7 @@ public class VelocityTemplateHandler {
 		ve.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
 		ve.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
 		ve.init();
-		this.template = ve.getTemplate(template);
+		this.template = ve.getTemplate(template, "UTF-8");
 	}
 
 	public String getFilledTemplate(VelocityContext context) {

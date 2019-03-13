@@ -15,7 +15,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +29,7 @@ import doko.lineup.LineUp;
 import doko.lineup.UnnamedLineUp;
 import doko.util.JSONHandler;
 import doko.util.LoginCredentialsStruct;
+import doko.util.PasswordHandler;
 import doko.util.RoundStruct;
 
 @Controller
@@ -51,7 +51,7 @@ public class PostController extends RequestController {
 		}
 
 		String storedPassword = user.get().getPassword();
-		if (BCrypt.checkpw(password, storedPassword)) {
+		if (PasswordHandler.checkPassword(password, storedPassword)) {
 			request.getSession().setAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME, user.get().getId());
 
 			if (keepLoggedIn.equals("on")) {
@@ -69,6 +69,36 @@ public class PostController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
+	@PostMapping(value = DokoConstants.USER_CHANGE_PASSWORD_LOCATION) //TODO needs protection from CSRF
+	public ResponseEntity<String> changePassword(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "oldpw") String oldPassword, @RequestParam(value = "newpw") String newPassword,
+			@RequestParam(value = "newpw2") String newPassword2) {
+		Optional<User> user = getLoggedInUser(request);
+		if (!user.isPresent()) {
+			return ErrorPageController.getUnauthorizedPage();
+		}
+
+		String storedPassword = user.get().getPassword();
+		if (PasswordHandler.checkPassword(oldPassword, storedPassword)) {
+			if (newPassword.equals(newPassword2)) {
+				boolean changed = userService.changeUserPassword(user.get(), newPassword);
+				if (changed) {
+					setSuccess(request, "Passwort geändert!");
+				} else {
+					setError(request, "Fehler beim Ändern des Passwortes.");
+				}
+				redirectTo(response, DokoConstants.PROFILE_PAGE_LOCATION);
+				return new ResponseEntity<>(HttpStatus.OK);
+			}
+			setError(request, "Die neuen Passwörter müssen übereinstimmen.");
+			redirectTo(response, DokoConstants.PROFILE_PAGE_LOCATION);
+			return new ResponseEntity<>(HttpStatus.OK);
+		}
+		setError(request, "Falsches Passwort!");
+		redirectTo(response, DokoConstants.PROFILE_PAGE_LOCATION);
+		return new ResponseEntity<>(HttpStatus.OK);
+	}
+
 	@PostMapping(value = DokoConstants.API_LOGIN_LOCATION)
 	public ResponseEntity<String> getToken(HttpServletRequest request, HttpServletResponse response,
 			@RequestBody LoginCredentialsStruct credentials) {
@@ -80,7 +110,7 @@ public class PostController extends RequestController {
 		}
 
 		String storedPassword = user.get().getPassword();
-		if (BCrypt.checkpw(password, storedPassword)) {
+		if (PasswordHandler.checkPassword(password, storedPassword)) {
 			Token token = tokenService.generateNewToken(user.get());
 			return new ResponseEntity<>(token.getTokenValue(), HttpStatus.OK);
 		}

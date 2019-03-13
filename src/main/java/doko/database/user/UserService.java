@@ -6,6 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import doko.util.PasswordHandler;
+
 @Service
 public class UserService {
 
@@ -34,6 +36,12 @@ public class UserService {
 
 	public Optional<User> getUserByName(String username) {
 		return Optional.ofNullable(userRepository.findByUsername(username));
+	}
+
+	public boolean changeUserPassword(User user, String newPassword) {
+		user.setPassword(PasswordHandler.getPasswordDerivation(newPassword));
+		user = userRepository.save(user);
+		return PasswordHandler.checkPassword(newPassword, user.getPassword());
 	}
 
 	@Autowired
