@@ -76,6 +76,7 @@ public class HtmlProvider {
 		VelocityContext context = new VelocityContext();
 		context.put("player", player);
 		context.put("games", games);
+		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
 
