@@ -24,7 +24,7 @@ public class Player implements Comparable<Player> {
 
 	public Player() {
 	}
-	
+
 	public Long getId() {
 		return id;
 	}

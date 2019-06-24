@@ -1,11 +1,9 @@
 package doko.rest;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -110,31 +108,34 @@ public class GetController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@GetMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION)
-	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//changes server stuff, so move to post. also CSRF
-		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
-		Cookie storedCookie = getRememberCookie(request);
-		if (storedCookie != null) {
-			tokenService.deleteTokenByValue(storedCookie.getValue());
-		}
-		Cookie deleteCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
-		deleteCookie.setMaxAge(0); // Delete Cookie
-		response.addCookie(deleteCookie);
-
+	@GetMapping(value = "/player", produces = "text/html")
+	public ResponseEntity<String> getPlayer(HttpServletRequest request, HttpServletResponse response, @RequestParam(value ="id") String playerIdString) {
+		boolean isLoggedIn = isUserLoggedIn(request);
+		String error = consumeErrorMessage(request);
+		String success = consumeSuccessMessage(request);
+		Long playerId;
 		try {
-			response.sendRedirect("/");
-		} catch (IOException e) {
-			// TODO log
+			playerId = Long.parseLong(playerIdString);
+		} catch (NumberFormatException e) {
+			return ErrorPageController.getBadRequestPage();
 		}
-		return new ResponseEntity<>(HttpStatus.OK);
+		Optional<Player> player = playerService.getPlayer(playerId);
+		if (player.isPresent()) {
+			List<SortedGame> games = gameService.getGamesForPlayer(player.get());
+			HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+			return new ResponseEntity<>(
+					velocity.getPlayerPageHtml(error, success, player.get(), games), HttpStatus.OK);
+		} else {
+			return ErrorPageController.getPageNotFoundPage();
+		}
 	}
 
-	@GetMapping(value = "/games")
+	@GetMapping(value = "/games", produces = "application/json")
 	public ResponseEntity<List<SortedGame>> getGames() {
 		return new ResponseEntity<>(gameService.getValidGamesOrdered(), HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/players")
+	@GetMapping(value = "/players", produces = "application/json")
 	public ResponseEntity<List<Player>> getPlayers() {
 		return new ResponseEntity<>(playerService.getAllPlayers(), HttpStatus.OK);
 	}

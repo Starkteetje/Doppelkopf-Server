@@ -43,6 +43,10 @@ public class NamedLineUp extends LineUp {
 		return ids.size();
 	}
 
+	public boolean contains(Long playerid) {
+		return getIds().contains(playerid);
+	}
+
 	public String getLineUpString() {
 		return lineUpString;
 	}

@@ -12,6 +12,8 @@ public abstract class LineUp {
 
 	public abstract int size();
 
+	public abstract boolean contains(Long playerid);
+
 	@Override
 	public boolean equals(Object lineUp) {
 		if (lineUp instanceof LineUp) {

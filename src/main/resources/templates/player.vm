@@ -1,0 +1,38 @@
+<h1>$player.getName()</h1>
+
+#if ($games.size() > 0)
+	#set ($baseLink = $roundUrl + "?id=")
+	<table class="results">
+		<tr class="bigborder">
+			<td class="tablehead">Datum</td>
+			<td class="tablehead">Ergebnis</td>
+		</tr>
+
+		#set ($numberOfGames = $games.size())
+		#set ($total = 0)
+		#foreach ($game in $games)
+			<tr>
+				#if ($game.getUniqueGameId() && $game.getUniqueGameId != "")
+					<td><a href="$baseLink$game.getUniqueGameId()">$dateFormatter.format($game.getDate())</a></td>
+				#else
+					<td>$dateFormatter.format($game.getDate())</td>
+				#end
+				#set ($index = $game.getLineUp().getIds().indexOf($player.getId()))
+				#set ($score = $game.getScores().get($index))
+				#set ($total = $total + $score)
+				<td>$score</td>
+			</tr>
+		#end
+
+		<tr class="bigborder">
+			<td>Gesamtpunktzahl</td>
+			<td> $total </td>
+		</tr>
+
+		<tr class="bigborder">
+			<td>Durchschnitt</td>
+			#set ($average = $Double.parseDouble($total.toString()) / $numberOfGames)
+			<td> $doubleFormatter.format($average) </td>
+		</tr>
+	</table>
+#end

@@ -94,4 +94,8 @@ public class UnnamedLineUp extends LineUp {
 	public int size() {
 		return ids.size();
 	}
+
+	public boolean contains(Long playerid) {
+		return getIds().contains(playerid);
+	}
 }

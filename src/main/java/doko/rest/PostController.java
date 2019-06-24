@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -67,6 +68,27 @@ public class PostController extends RequestController {
 			return new ResponseEntity<>(HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
+	}
+
+
+
+	@GetMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION)
+	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//TODO needs protection from CSRF
+		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
+		Cookie storedCookie = getRememberCookie(request);
+		if (storedCookie != null) {
+			tokenService.deleteTokenByValue(storedCookie.getValue());
+		}
+		Cookie deleteCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
+		deleteCookie.setMaxAge(0); // Delete Cookie
+		response.addCookie(deleteCookie);
+
+		try {
+			response.sendRedirect("/");
+		} catch (IOException e) {
+			// TODO log
+		}
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 
 	@PostMapping(value = DokoConstants.USER_CHANGE_PASSWORD_LOCATION) //TODO needs protection from CSRF

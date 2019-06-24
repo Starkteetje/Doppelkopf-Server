@@ -66,6 +66,22 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
+	public String getPlayerPageHtml(String error, String success, Player player, List<SortedGame> games) {
+		String playerHtml = getPlayerHtml(player, games);
+		return getPageHtml(error, success, playerHtml);
+	}
+
+	private String getPlayerHtml(Player player, List<SortedGame> games) {
+		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/player.vm");
+		VelocityContext context = new VelocityContext();
+		context.put("player", player);
+		context.put("games", games);
+		context.put("doubleFormatter", new DecimalFormat("#.##"));
+		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
+
+		return ve.getFilledTemplate(context);
+	}
+
 	public String getDisplayLineUpPageHtml(String error, String success, String lineUpRules,
 			NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp) {
 		String displayHtml = getDisplayHtml(lineUp, lineUpGames, isMoneyLineUp, lineUpRules);

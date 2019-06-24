@@ -32,6 +32,10 @@ public class ErrorPageController extends AbstractErrorController implements Erro
 		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // TODO return error page
 	}
 
+	public static <T> ResponseEntity<T> getPageNotFoundPage() {
+		return new ResponseEntity<>(HttpStatus.NOT_FOUND); // TODO return error page
+	}
+
 	@RequestMapping
 	@ResponseBody
 	public ResponseEntity<String> error(HttpServletRequest request) {
