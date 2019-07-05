@@ -127,6 +127,7 @@ public class HtmlProvider {
 		context.put("lineUp", lineUp);
 		context.put("games", lineUpGames);
 		context.put("roundUrl", DokoConstants.GAME_PAGE_LOCATION);
+		context.put("playerUrl", DokoConstants.PLAYER_STATS_PAGE_LOCATION);
 		context.put("dataForAllSessions", allSessionsJSON);
 		context.put("dataPerSession", perSessionJSON);
 		context.put("ticks", ticksJSON);
@@ -155,6 +156,7 @@ public class HtmlProvider {
 		context.put("date", date);
 		context.put("players", players);
 		context.put("rounds", rounds);
+		context.put("playerUrl", DokoConstants.PLAYER_STATS_PAGE_LOCATION);
 		context.put("dataForAllRounds", allRoundsJson);
 		context.put("ticks", getJSONForTicks(rounds));
 		context.put(Double.class.getSimpleName(), Double.class);

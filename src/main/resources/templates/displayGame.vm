@@ -6,7 +6,7 @@
 		#set ($scores = [])
 		#set ($lastPlayerIndex = $players.size() - 1)
 		#foreach ($player in $players)
-			<td class="tablehead"> $player.getName() </td>
+			<td class="tablehead"><a href=$playerUrl?id=$player.getId()> $player.getName() </a></td>
 			#set ($add = $scores.add(0)) #*//disable output true*#
 		#end
 	</tr>
