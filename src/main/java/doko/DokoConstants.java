@@ -31,6 +31,7 @@ public abstract class DokoConstants {
 	public static final String PROFILE_PAGE_LOCATION = "/profile";
 	public static final String USER_CHANGE_PASSWORD_LOCATION = "/changepw";
 	public static final String GAME_PAGE_LOCATION = "/game";
+	public static final String PLAYER_STATS_PAGE_LOCATION = "/player";
 
 	public static final String API_LOGIN_LOCATION = "/api/login";
 	public static final String API_ADD_GAME_LOCATION = "/api/report";

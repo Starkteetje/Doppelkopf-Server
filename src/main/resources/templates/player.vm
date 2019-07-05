@@ -1,7 +1,18 @@
 <h1>$player.getName()</h1>
 
+<div id="data" data-ticks="$ticks" data-playerrounddata="$dataForRounds" style="hidden"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="player.js" integrity="sha384-EegxaYm2xaRTQDR5FuqrF11F6SbJSbZ+yQcBFTm4y5KxSS8HtR05RuUBJVqz9MkD" crossorigin="anonymous"></script>
+
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jshost"><div id="runden"></div></td>
+	</tr>
+</table>
+
 #if ($games.size() > 0)
 	#set ($baseLink = $roundUrl + "?id=")
+	<h2>Ergebnisse</h2>
 	<table class="results">
 		<tr class="bigborder">
 			<td class="tablehead">Datum</td>

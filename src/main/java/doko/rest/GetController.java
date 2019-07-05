@@ -43,7 +43,7 @@ public class GetController extends RequestController {
 		NamedLineUp lineUp = playerService.getNamedLineUp(lineUpString);
 		List<SortedGame> lineUpGames = gameService.getGamesForLineUp(lineUp);
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 		return new ResponseEntity<>(
 				velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames, isMoneyLineUp), HttpStatus.OK);
 
@@ -64,7 +64,7 @@ public class GetController extends RequestController {
 		List<Round> rounds = roundService.getRoundsByUniqueGameId(gameId);
 		NamedLineUp lineUp = playerService.getNamedLineUp(new SortedGame(game.get()).getLineUp());
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 		return new ResponseEntity<>(
 				velocity.getGamePageHtml(error, success, lineUp, rounds, date), HttpStatus.OK);
 	}
@@ -75,7 +75,7 @@ public class GetController extends RequestController {
 		String error = consumeErrorMessage(request);
 		String success = consumeSuccessMessage(request);
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 		return new ResponseEntity<>(velocity.getLoginPageHtml(error, success),
 				HttpStatus.OK);
 	}
@@ -87,7 +87,7 @@ public class GetController extends RequestController {
 		String success = consumeSuccessMessage(request);
 		List<Player> players = playerService.getAllPlayers();
 
-		HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 		return new ResponseEntity<>(
 				velocity.getReportingPageHtml(error, success, players), HttpStatus.OK);
 	}
@@ -101,14 +101,14 @@ public class GetController extends RequestController {
 		Optional<User> user = getLoggedInUser(request);
 
 		if (user.isPresent()) {
-			HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+			HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 			return new ResponseEntity<>(
 					velocity.getProfilePageHtml(error, success, user.get()), HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-	@GetMapping(value = "/player", produces = "text/html")
+	@GetMapping(value = DokoConstants.PLAYER_STATS_PAGE_LOCATION, produces = "text/html")
 	public ResponseEntity<String> getPlayer(HttpServletRequest request, HttpServletResponse response, @RequestParam(value ="id") String playerIdString) {
 		boolean isLoggedIn = isUserLoggedIn(request);
 		String error = consumeErrorMessage(request);
@@ -122,7 +122,7 @@ public class GetController extends RequestController {
 		Optional<Player> player = playerService.getPlayer(playerId);
 		if (player.isPresent()) {
 			List<SortedGame> games = gameService.getGamesForPlayer(player.get());
-			HtmlProvider velocity = new HtmlProvider(gameService, playerService, isLoggedIn);
+			HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 			return new ResponseEntity<>(
 					velocity.getPlayerPageHtml(error, success, player.get(), games), HttpStatus.OK);
 		} else {

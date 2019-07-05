@@ -1,6 +1,6 @@
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(drawCharts);
-      
+
 function drawCharts() {
   drawAllSessionsChart();
   drawPerSessionChart();

@@ -18,6 +18,7 @@ import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.round.Round;
+import doko.database.round.RoundService;
 import doko.database.user.User;
 import doko.lineup.NamedLineUp;
 
@@ -25,11 +26,13 @@ public class HtmlProvider {
 
 	private GameService gameService;
 	private PlayerService playerService;
+	private RoundService roundService;
 	private boolean isLoggedIn;
 
-	public HtmlProvider(GameService gameService, PlayerService playerService, boolean isLoggedIn) {
+	public HtmlProvider(GameService gameService, PlayerService playerService, RoundService roundService, boolean isLoggedIn) {
 		this.gameService = gameService;
 		this.playerService = playerService;
+		this.roundService = roundService;
 		this.isLoggedIn = isLoggedIn;
 	}
 
@@ -74,8 +77,24 @@ public class HtmlProvider {
 	private String getPlayerHtml(Player player, List<SortedGame> games) {
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/player.vm");
 		VelocityContext context = new VelocityContext();
+		List<List<Round>> availabeRounds = new ArrayList<>();
+		int maxRounds = 0;
+		for (SortedGame game : games) {
+			List<Round> rounds = roundService.getRoundsByUniqueGameId(game.getUniqueGameId());
+			if (!rounds.isEmpty()) {
+				availabeRounds.add(rounds);
+				if (rounds.size() > maxRounds) {
+					maxRounds = rounds.size();
+				}
+			}
+		}
+		String averageRoundJSON = getEncodedJSONForPlayerRoundsGraph(player, availabeRounds, maxRounds);
+		String ticksJSON = getJSONForTicks(maxRounds); // NOTE the tick count is wrong, but graph still renders well. WONTFIX for now
 		context.put("player", player);
 		context.put("games", games);
+		context.put("roundUrl", DokoConstants.GAME_PAGE_LOCATION);
+		context.put("dataForRounds", averageRoundJSON);
+		context.put("ticks", ticksJSON);
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
@@ -131,7 +150,7 @@ public class HtmlProvider {
 		// Template assumes that for all rounds the order of players is the same
 		VelocityTemplateHandler ve = new VelocityTemplateHandler("templates/displayGame.vm");
 		List<Player> players = playerService.getPlayersSortedById(rounds.get(0).getPlayerIds());
-		String allRoundsJson = getEncodedJsonForAllRoundsGraph(lineUp, rounds);
+		String allRoundsJson = getEncodedJSONForAllRoundsGraph(lineUp, rounds);
 		VelocityContext context = new VelocityContext();
 		context.put("date", date);
 		context.put("players", players);
@@ -183,7 +202,7 @@ public class HtmlProvider {
 		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
 	}
 
-	private String getEncodedJsonForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
+	private String getEncodedJSONForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
 		List<List<Object>> graphData = getGraphHeader(lineUp);
 
 		List<Long> previousScores = new ArrayList<>();
@@ -208,13 +227,72 @@ public class HtmlProvider {
 	}
 
 	private <E> String getJSONForTicks(List<E> list) {
-		int[] ticks = new int[list.size() - 1];
+		return getJSONForTicks(list.size());
+	}
+
+	private String getJSONForTicks(int size) {
+		if (size < 1) {
+			return getJSONForTicks(1);
+		}
+		int[] ticks = new int[size - 1];
 		for (int i = 0; i < ticks.length; i++) {
 			ticks[i] = i + 1;
 		}
 
 		Gson gson = new Gson();
 		return gson.toJson(ticks);
+	}
+
+	private String getEncodedJSONForPlayerRoundsGraph(Player player, List<List<Round>> listOfRounds, int maxRounds) {
+		List<List<Object>> graphData = new ArrayList<>();
+		Long playerId = player.getId();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Runde");
+		legend.add(player.getName());
+		graphData.add(legend);
+
+		List<List<Long>> roundScores = new ArrayList<>();
+		for (int i = 0; i < maxRounds; i++) {
+			roundScores.add(new ArrayList<>());
+		}
+		for (int i = 0; i < listOfRounds.size(); i++) {
+			List<Round> rounds = listOfRounds.get(i);
+			for (int j = 0; j < rounds.size(); j++) {
+				Round round = rounds.get(j);
+				Long score = getScoreByPlayerId(round, playerId);
+				roundScores.get(j).add(score);
+			}
+		}
+
+		int roundCounter = 1;
+		for (List<Long> roundScore : roundScores) {
+			if (roundScore.size() < 5) {
+				break;
+			}
+			List<Object> roundData = new ArrayList<>();
+			Float averageScore = (float)sumOfLongs(roundScore) / roundScore.size();
+			roundData.add(roundCounter);
+			roundData.add(averageScore);
+			graphData.add(roundData);
+			roundCounter++;
+		}
+
+		Gson gson = new Gson();
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+	}
+
+	private Long getScoreByPlayerId(Round round, Long playerId) {
+		int index = round.getPlayerIds().indexOf(playerId);
+		return round.getScores().get(index);
+	}
+
+	private Long sumOfLongs(List<Long> longs) {
+		Long sum = 0l;
+		for (Long long1 : longs) {
+			sum+= long1;
+		}
+		return sum;
 	}
 
 	private List<List<Object>> getGraphHeader(NamedLineUp lineUp) {

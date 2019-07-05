@@ -69,6 +69,10 @@ public class FileExposer {
 		return getJS("session.js");
 	}
 
+	public byte[] getPlayerGraphJS() {
+		return getJS("player.js");
+	}
+
 	public byte[] getMainCSS() {
 		return getCSS("style.css");
 	}
