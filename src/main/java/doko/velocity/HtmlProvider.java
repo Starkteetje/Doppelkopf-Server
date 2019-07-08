@@ -90,11 +90,15 @@ public class HtmlProvider {
 		}
 		String averageRoundJSON = getEncodedJSONForPlayerRoundsGraph(player, availabeRounds, maxRounds);
 		String ticksJSON = getJSONForTicks(maxRounds); // NOTE the tick count is wrong, but graph still renders well. WONTFIX for now
+		String placementJson = getEncodedJSONForPlayerPlacementsGraph(player, games);
+		String signJson = getEncodedJSONForPlayerSignGraph(player, games);
 		context.put("player", player);
 		context.put("games", games);
 		context.put("roundUrl", DokoConstants.GAME_PAGE_LOCATION);
 		context.put("dataForRounds", averageRoundJSON);
 		context.put("ticks", ticksJSON);
+		context.put("dataForPlacements", placementJson);
+		context.put("dataForSign", signJson);
 		context.put(Double.class.getSimpleName(), Double.class);
 		context.put("doubleFormatter", new DecimalFormat("#.##"));
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
@@ -284,6 +288,77 @@ public class HtmlProvider {
 		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
 	}
 
+	// Assumes 4 players
+	private String getEncodedJSONForPlayerPlacementsGraph(Player player, List<SortedGame> games) {
+		List<List<Object>> graphData = new ArrayList<>();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Platzierung");
+		legend.add("Anzahl der Platzierungen");
+		graphData.add(legend);
+
+		List<Integer> placements = new ArrayList<>();
+		for (int i = 0; i < 4; i++) {
+			placements.add(0);
+		}
+		for (SortedGame game : games) {
+			int placement = getPlacementByPlayerId(game, player.getId());
+			placements.set(placement, placements.get(placement).intValue() + 1);
+		}
+
+		for (int i = 0; i < 4; i++) {
+			List<Object> ithPlacement = new ArrayList<>();
+			ithPlacement.add(new Integer(i + 1).toString() + ". Platz");
+			ithPlacement.add(placements.get(i));
+			graphData.add(ithPlacement);
+		}
+
+		Gson gson = new Gson();
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+	}
+
+	private String getEncodedJSONForPlayerSignGraph(Player player, List<SortedGame> games) {
+		List<List<Object>> graphData = new ArrayList<>();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Vorzeichen");
+		legend.add("Anzahl der Endergebnisse");
+		graphData.add(legend);
+
+		List<Integer> signs = new ArrayList<>();
+		for (int i = 0; i < 3; i++) {
+			signs.add(0);
+		}
+		for (SortedGame game : games) {
+			Long score = getScoreByPlayerId(game, player.getId());
+			if (score > 0) {
+				signs.set(0, signs.get(0).intValue() + 1);
+			} else if (score == 0) {
+				signs.set(1, signs.get(1).intValue() + 1);
+			} else {
+				signs.set(2, signs.get(2).intValue() + 1);
+			}
+		}
+
+		List<Object> positiveArray = new ArrayList<>();
+		positiveArray.add("Positiv");
+		positiveArray.add(signs.get(0));
+		graphData.add(positiveArray);
+
+		List<Object> neutralArray = new ArrayList<>();
+		neutralArray.add("Neutral");
+		neutralArray.add(signs.get(1));
+		graphData.add(neutralArray);
+
+		List<Object> negativeArray = new ArrayList<>();
+		negativeArray.add("Negativ");
+		negativeArray.add(signs.get(2));
+		graphData.add(negativeArray);
+
+		Gson gson = new Gson();
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+	}
+
 	private Long getScoreByPlayerId(Round round, Long playerId) {
 		int index = round.getPlayerIds().indexOf(playerId);
 		return round.getScores().get(index);
@@ -295,6 +370,25 @@ public class HtmlProvider {
 			sum+= long1;
 		}
 		return sum;
+	}
+
+	// Returns from 0 to 3 for easier index ops
+	private int getPlacementByPlayerId(SortedGame game, Long playerId) {
+		Long playerScore = getScoreByPlayerId(game, playerId);
+		List<Long> scores = game.getScores();
+		int placement = 0;
+
+		for (Long score : scores) {
+			if (score > playerScore) {
+				placement++;
+			}
+		}
+		return placement;
+	}
+
+	private Long getScoreByPlayerId(SortedGame game, Long playerId) {
+		int index = game.getLineUp().getIds().indexOf(playerId);
+		return game.getScores().get(index);
 	}
 
 	private List<List<Object>> getGraphHeader(NamedLineUp lineUp) {

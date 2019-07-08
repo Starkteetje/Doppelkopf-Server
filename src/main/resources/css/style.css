@@ -52,6 +52,13 @@ td.jshost {
 	height: 250px;
 }
 
+td.jsplayer {
+	border: none;
+	width: 700px;
+	height: 400px;
+	padding: 0px;
+}
+
 td.tablehead {
 	background-color: #0095CF;
 }
