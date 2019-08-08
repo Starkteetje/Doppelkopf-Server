@@ -6,8 +6,8 @@ services:
     image: "mysql:5.7"
     command: --default-authentication-plugin=mysql_native_password
     environment:
-        MYSQL_ROOT_PASSWORD: "SomePassword"
-        MYSQL_DATABASE: "dokodb"
+        MYSQL_ROOT_PASSWORD: "${DATABASE_PASSWORD}"
+        MYSQL_DATABASE: "${DATABASE_NAME}"
     volumes:
       - ./init-data:/docker-entrypoint-initdb.d
   web:
@@ -23,3 +23,8 @@ services:
         - "443"
     ports:
      - "443:443"
+    environment:
+     - DATABASE_NAME=${DATABASE_NAME}
+     - DATABASE_USERNAME=${DATABASE_USERNAME}
+     - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+     - SSL_KEYSTORE_PASSWORD=${SSL_KEYSTORE_PASSWORD}
