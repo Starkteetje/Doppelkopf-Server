@@ -73,7 +73,7 @@
 		</tr>
 	</table>
 
-	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" style="hidden"></div>
+	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" style="hidden"></div>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="session.js" integrity="sha384-iVc0ifcemSyvXTJbdODcLmDhLNU87TBbCw7lnkUxNbygtCG7L1y/7VLle8bBzKwJ" crossorigin="anonymous"></script>
 
@@ -86,6 +86,40 @@
 		</tr>
 	</table>
 #end
+
+<script type="text/javascript" src="players.js" integrity="sha384-0SOQY/M/TClyfD6I4bmJQQYXOvGBO19q4huWpymgE4cxOcbG9f+bMvnsP1Q+8CwE" crossorigin="anonymous"></script>
+
+<h3>Statistiken für $players.get(0).getName()</h3>
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jsplayer"><div id="placements0" style="width: 700px; height: 400px;"></div></td>
+		<td class="jsplayer"><div id="sign0" style="width: 700px; height: 400px;"></div></td>
+	</tr>
+</table>
+
+<h3>Statistiken für $players.get(1).getName()</h3>
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jsplayer"><div id="placements1" style="width: 700px; height: 400px;"></div></td>
+		<td class="jsplayer"><div id="sign1" style="width: 700px; height: 400px;"></div></td>
+	</tr>
+</table>
+
+<h3>Statistiken für $players.get(2).getName()</h3>
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jsplayer"><div id="placements2" style="width: 700px; height: 400px;"></div></td>
+		<td class="jsplayer"><div id="sign2" style="width: 700px; height: 400px;"></div></td>
+	</tr>
+</table>
+
+<h3>Statistiken für $players.get(3).getName()</h3>
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jsplayer"><div id="placements3" style="width: 700px; height: 400px;"></div></td>
+		<td class="jsplayer"><div id="sign3" style="width: 700px; height: 400px;"></div></td>
+	</tr>
+</table>
 
 #if ($rules != "")
 	<br />

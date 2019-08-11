@@ -127,6 +127,16 @@ public class HtmlProvider {
 		String allSessionsJSON = getEncodedJSONForAllSessionsGraph(lineUp, lineUpGames);
 		String perSessionJSON = getEncodedJSONForPerSessionGraph(lineUp, lineUpGames);
 		String ticksJSON = getJSONForTicks(lineUpGames);
+
+		List<String> placementJsons = new ArrayList<>();
+		List<String> signJsons = new ArrayList<>();
+		for (Player player : lineUp.getPlayers()) {
+			String placementJson = getEncodedJSONForPlayerPlacementsGraph(player, lineUpGames);
+			placementJsons.add(placementJson);
+			String signJson = getEncodedJSONForPlayerSignGraph(player, lineUpGames);
+			signJsons.add(signJson);
+		}
+
 		VelocityContext context = new VelocityContext();
 		context.put("lineUp", lineUp);
 		context.put("games", lineUpGames);
@@ -134,6 +144,8 @@ public class HtmlProvider {
 		context.put("playerUrl", DokoConstants.PLAYER_STATS_PAGE_LOCATION);
 		context.put("dataForAllSessions", allSessionsJSON);
 		context.put("dataPerSession", perSessionJSON);
+		context.put("dataForPlacements", placementJsons);
+		context.put("dataForSigns", signJsons);
 		context.put("ticks", ticksJSON);
 		context.put("rules", lineUpRules);
 		context.put(Double.class.getSimpleName(), Double.class);

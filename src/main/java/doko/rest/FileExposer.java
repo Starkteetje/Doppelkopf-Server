@@ -73,6 +73,10 @@ public class FileExposer {
 		return getJS("player.js");
 	}
 
+	public byte[] getPlayersGraphJS() {
+		return getJS("players.js");
+	}
+
 	public byte[] getMainCSS() {
 		return getCSS("style.css");
 	}
