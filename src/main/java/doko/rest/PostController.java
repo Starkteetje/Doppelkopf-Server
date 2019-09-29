@@ -57,11 +57,7 @@ public class PostController extends RequestController {
 
 			if (keepLoggedIn.equals("on")) {
 				Token token = tokenService.generateNewToken(user.get());
-				Cookie rememberCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, token.getTokenValue());
-				rememberCookie.setSecure(true);
-				rememberCookie.setHttpOnly(true);
-				rememberCookie.setMaxAge(60 * 60 * 24 * 365); // Cookie is stored for 1 year
-				response.addCookie(rememberCookie);
+				setRememberCookie(response, token.getTokenValue());
 			}
 
 			redirectTo(response, DokoConstants.INDEX_PAGE_LOCATION);
@@ -70,8 +66,6 @@ public class PostController extends RequestController {
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
-
-
 	@GetMapping(value = DokoConstants.LOGOUT_PAGE_LOCATION)
 	public ResponseEntity<String> logoutUser(HttpServletRequest request, HttpServletResponse response) {//TODO needs protection from CSRF
 		request.getSession().removeAttribute(DokoConstants.SESSION_USER_ID_ATTRIBUTE_NAME);
@@ -79,9 +73,7 @@ public class PostController extends RequestController {
 		if (storedCookie != null) {
 			tokenService.deleteTokenByValue(storedCookie.getValue());
 		}
-		Cookie deleteCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
-		deleteCookie.setMaxAge(0); // Delete Cookie
-		response.addCookie(deleteCookie);
+		deleteRememberCookie(response);
 
 		try {
 			response.sendRedirect("/");

@@ -1,12 +1,18 @@
 package doko.rest;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -86,6 +92,23 @@ public class RequestController extends DokoController {
 			}
 		}
 		return null;
+	}
+
+	protected void setRememberCookie(HttpServletResponse response, String cookieValue) {
+		// SameSite attribute is not supported by Java cookie, thus via header
+		//remember_user=TOKENVALUE; Max-Age=31536000; Expires=Mon, 28-Sep-2020 08:36:04 GMT; Secure; HttpOnly
+		int maxAge = 60 * 60 * 24 * 365;
+		Date expiryDate= new Date();
+		expiryDate.setTime (expiryDate.getTime() + maxAge);
+		DateFormat df = new SimpleDateFormat("EEE, dd-MMM-yyyy HH:mm:ss zzz", Locale.US);
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		response.setHeader("Set-Cookie", String.format("%s=%s; Max-Age=%d; Expires=%s; SameSite=strict; Secure; HttpOnly;", DokoConstants.LOGIN_COOKIE_NAME, cookieValue, maxAge, df.format(expiryDate)));
+	}
+
+	protected void deleteRememberCookie(HttpServletResponse response) {
+		Cookie deleteCookie = new Cookie(DokoConstants.LOGIN_COOKIE_NAME, "");
+		deleteCookie.setMaxAge(0); // Delete Cookie
+		response.addCookie(deleteCookie);
 	}
 
 	public List<List<Object>> getLineUpGames(LineUp lineUp) {
