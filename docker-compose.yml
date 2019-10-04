@@ -12,6 +12,7 @@ services:
       - ./init-data:/docker-entrypoint-initdb.d
   web:
     container_name: "doko-server-container"
+    restart: "always"
     build:
         context: .
         dockerfile: "Dockerfile"
