@@ -4,7 +4,7 @@ set -eu
 source .env
 
 #create a backup
-./backup.sh
+./backup.sh || true
 
 # update certificate if necessary
 certbot renew
