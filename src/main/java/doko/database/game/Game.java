@@ -65,6 +65,7 @@ public class Game {
 		this.score4 = score4;
 		this.submitterId = submitterId;
 		this.date = date;
+		this.date.setHours(12); // TODO shitty workaround for timezone missmatch between app and database
 		// TODO validate
 		// TODO decide whether to accept empty entries (placeholder = 0) as 0
 	}
