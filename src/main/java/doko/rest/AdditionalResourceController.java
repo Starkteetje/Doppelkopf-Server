@@ -84,4 +84,9 @@ public class AdditionalResourceController extends DokoController {
 	public ResponseEntity<byte[]> getPlayersGraphJS() {
 		return new ResponseEntity<>(fileExposer.getPlayersGraphJS(), HttpStatus.OK);
 	}
+
+	@GetMapping(value = "/playedWith.js", produces = "application/javascript")
+	public ResponseEntity<byte[]> getPlayedWithGraphsJS() {
+		return new ResponseEntity<>(fileExposer.getPlayedWithGraphsJS(), HttpStatus.OK);
+	}
 }

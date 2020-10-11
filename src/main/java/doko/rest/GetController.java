@@ -1,5 +1,6 @@
 package doko.rest;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -39,13 +40,17 @@ public class GetController extends RequestController {
 		String error = consumeErrorMessage(request);
 		String success = consumeSuccessMessage(request);
 		String lineUpRules = getRules(lineUpString);
-		boolean isMoneyLineUp = lineUpString.equals(DokoConstants.DEFAULT_LINEUP_STRING); //TODO
+		boolean isMoneyLineUp = lineUpString.equals(DokoConstants.DEFAULT_LINEUP_STRING); // TODO
 		NamedLineUp lineUp = playerService.getNamedLineUp(lineUpString);
 		List<SortedGame> lineUpGames = gameService.getGamesForLineUp(lineUp);
+		List<Round> rounds = new ArrayList<>();
+		for (SortedGame game : lineUpGames) {
+			rounds.addAll(roundService.getRoundsByUniqueGameId(game.getUniqueGameId()));
+		}
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
 		return new ResponseEntity<>(
-				velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames, isMoneyLineUp), HttpStatus.OK);
+				velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames, rounds, isMoneyLineUp), HttpStatus.OK);
 
 	}
 

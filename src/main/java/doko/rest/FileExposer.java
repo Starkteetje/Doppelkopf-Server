@@ -77,6 +77,10 @@ public class FileExposer {
 		return getJS("players.js");
 	}
 
+	public byte[] getPlayedWithGraphsJS() {
+		return getJS("playedWith.js");
+	}
+
 	public byte[] getMainCSS() {
 		return getCSS("style.css");
 	}

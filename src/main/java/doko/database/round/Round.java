@@ -76,6 +76,9 @@ public class Round implements Comparable<Round> {
 		return id;
 	}
 
+	/*
+	 * Return the sorted list of player ids
+	 */
 	public List<Long> getPlayerIds() {
 		List<Long> ids = new ArrayList<>();
 		ids.add(player1);
@@ -86,6 +89,9 @@ public class Round implements Comparable<Round> {
 		return ids;
 	}
 
+	/*
+	 * Return the scores in order of sorted players
+	 */
 	public List<Long> getScores() {
 		List<Long> ids = getPlayerIds();
 		List<Long> scores = new ArrayList<>();

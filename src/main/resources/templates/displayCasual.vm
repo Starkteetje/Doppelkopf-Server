@@ -46,7 +46,7 @@
 		</tr>
 	</table>
 
-	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" style="hidden"></div>
+	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" data-playedwith='$playedWith' style="hidden"></div>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript" src="session.js" integrity="sha384-iVc0ifcemSyvXTJbdODcLmDhLNU87TBbCw7lnkUxNbygtCG7L1y/7VLle8bBzKwJ" crossorigin="anonymous"></script>
 
@@ -93,6 +93,56 @@
 		<td class="jsplayer"><div id="sign3" style="width: 700px; height: 400px;"></div></td>
 	</tr>
 </table>
+
+#if ($playedWith != "null")
+    <script type="text/javascript" src="playedWith.js" crossorigin="anonymous"></script>
+
+	<br />
+	<table>
+		<th>
+			<td><h3>Matchups von $players.get(0).getName()</h3></td>
+			<td><h3>Matchups von $players.get(1).getName()</h3></td>
+			<td><h3>Matchups von $players.get(2).getName()</h3></td>
+			<td><h3>Matchups von $players.get(3).getName()</h3></td>
+		</th>
+		<tr>
+			<td>
+				<h3>Matchups von $players.get(0).getName()</h3>
+			</td>
+			<td><div id="0,0" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="0,1" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="0,2" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="0,3" style="width: 500px; height: 400px;"></div></td>
+		</tr>
+		<tr>
+			<td>
+				<h3>Matchups von $players.get(1).getName()</h3>
+			</td>
+			<td><div id="1,0" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="1,1" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="1,2" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="1,3" style="width: 500px; height: 400px;"></div></td>
+		</tr>
+		<tr>
+			<td>
+				<h3>Matchups von $players.get(2).getName()</h3>
+			</td>
+			<td><div id="2,0" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="2,1" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="2,2" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="2,3" style="width: 500px; height: 400px;"></div></td>
+		</tr>
+		<tr>
+			<td>
+				<h3>Matchups von $players.get(3).getName()</h3>
+			</td>
+			<td><div id="3,0" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="3,1" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="3,2" style="width: 500px; height: 400px;"></div></td>
+			<td><div id="3,3" style="width: 500px; height: 400px;"></div></td>
+		</tr>
+	</table>
+#end
 
 #if ($rules != "")
 	<br />

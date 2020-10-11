@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import org.apache.velocity.VelocityContext;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import doko.DokoConstants;
 import doko.database.game.GameService;
@@ -107,12 +108,12 @@ public class HtmlProvider {
 	}
 
 	public String getDisplayLineUpPageHtml(String error, String success, String lineUpRules,
-			NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp) {
-		String displayHtml = getDisplayHtml(lineUp, lineUpGames, isMoneyLineUp, lineUpRules);
+			NamedLineUp lineUp, List<SortedGame> lineUpGames, List<Round> rounds, boolean isMoneyLineUp) {
+		String displayHtml = getDisplayHtml(lineUp, lineUpGames, rounds, isMoneyLineUp, lineUpRules);
 		return getPageHtml(error, success, displayHtml);
 	}
 
-	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, boolean isMoneyLineUp,
+	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, List<Round> rounds, boolean isMoneyLineUp,
 			String lineUpRules) {
 		VelocityTemplateHandler ve;
 		if (lineUpGames.isEmpty()) {
@@ -136,6 +137,9 @@ public class HtmlProvider {
 			String signJson = getEncodedJSONForPlayerSignGraph(player, lineUpGames);
 			signJsons.add(signJson);
 		}
+		List<List<String>> playedWithJsons = getEncodedJSONsForPlayWithTable(lineUp.getPlayers(), rounds);
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // Disable HTML escaping due to '=' in b64. b64 does not contain '<'
+		String playedWithJsonsJson = gson.toJson(playedWithJsons);
 
 		VelocityContext context = new VelocityContext();
 		context.put("lineUp", lineUp);
@@ -146,6 +150,7 @@ public class HtmlProvider {
 		context.put("dataPerSession", perSessionJSON);
 		context.put("dataForPlacements", placementJsons);
 		context.put("dataForSigns", signJsons);
+		context.put("playedWith", playedWithJsonsJson);
 		context.put("ticks", ticksJSON);
 		context.put("rules", lineUpRules);
 		context.put(Double.class.getSimpleName(), Double.class);
@@ -414,6 +419,119 @@ public class HtmlProvider {
 				.collect(Collectors.toList()));
 		graphData.add(legend);
 		return graphData;
+	}
+
+	/*
+	 * Caveats: Ignores 0-score games. Will ignore the non-solo parties of a solo. Somewhat assumes 4 players
+	 */
+	private List<List<String>> getEncodedJSONsForPlayWithTable(List<Player> players, List<Round> rounds) {
+		// Return null if no rounds
+		if (rounds.isEmpty()) {
+			return null;
+		}
+
+		List<Long> playerIds = rounds.get(0).getPlayerIds(); // PlayerIds are always sorted, thus in the same order
+		int numberOfPlayers = playerIds.size();
+		// Create matrix of scores
+		List<List<Long>> results = new ArrayList<>();
+		for (int i = 0; i < numberOfPlayers * numberOfPlayers; i++) {
+			results.add(new ArrayList<>());
+		}
+		for (Round round : rounds) {
+			updateResultList(results, round);
+		}
+
+		// Match result list to sorted players in case Round and LineUp do not have the same order
+		List<List<String>> tableJsons = new ArrayList<>();
+		for (Player player1 : players) {
+			int player1Index = rounds.get(0).getPlayerIds().indexOf(player1.getId());
+			List<String> playerPlayedWithJsons = new ArrayList<>();	
+			for (Player player2 : players) {
+				int player2Index = rounds.get(0).getPlayerIds().indexOf(player2.getId());
+				String playedWithJson = getPlayedWithEncodedJsonFromResult(results.get(numberOfPlayers * player1Index + player2Index));
+				playerPlayedWithJsons.add(playedWithJson);
+			}
+			tableJsons.add(playerPlayedWithJsons);
+		}
+		return tableJsons;
+	}
+
+	private void updateResultList(List<List<Long>> results, Round round) {
+		List<Long> scores = round.getScores();
+
+		// Score is 0, no idea who played together
+		if (scores.get(0) == 0) {
+			return;
+		}
+
+		List<Integer> postiveScoreIndices = new ArrayList<>();
+		List<Integer> negativeScoreIndices = new ArrayList<>();
+
+		for (int i = 0; i < scores.size(); i++) {
+			if (scores.get(i) > 0) {
+				postiveScoreIndices.add(i);
+			} else {
+				negativeScoreIndices.add(i);
+			}
+		}
+
+		// Won solo
+		if (negativeScoreIndices.size() > postiveScoreIndices.size()) {
+			int positiveIndex = postiveScoreIndices.get(0);
+			updateResultsScore(results, scores.size(), positiveIndex, positiveIndex, scores.get(positiveIndex));
+			// Lost solo
+		} else if (postiveScoreIndices.size() > negativeScoreIndices.size()) {
+			int negativeIndex = negativeScoreIndices.get(0);
+			updateResultsScore(results, scores.size(), negativeIndex, negativeIndex, scores.get(negativeIndex));
+			// Regular game
+		} else {
+			updateResultsScore(results, scores.size(), postiveScoreIndices.get(0), postiveScoreIndices.get(1), scores.get(postiveScoreIndices.get(0)));
+			updateResultsScore(results, scores.size(), negativeScoreIndices.get(0), negativeScoreIndices.get(1), scores.get(negativeScoreIndices.get(0)));
+		}
+	}
+
+	private void updateResultsScore(List<List<Long>> results, int numberOfPlayers, int player1Index, int player2Index, Long score) {
+		if (player1Index == player2Index) {
+			int changeIndex = numberOfPlayers * player1Index + player1Index;
+			results.get(changeIndex).add(score);
+		} else {
+			int changeIndex1 = numberOfPlayers * player1Index + player2Index;
+			int changeIndex2 = numberOfPlayers * player2Index + player1Index;
+			results.get(changeIndex1).add(score);
+			results.get(changeIndex2).add(score);
+		}
+	}
+
+	private String getPlayedWithEncodedJsonFromResult(List<Long> list) {
+		List<List<Object>> graphData = new ArrayList<>();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Vorzeichen mit Mitspieler");
+		legend.add("Anzahl der Partien");
+		graphData.add(legend);
+
+		List<Object> positive = new ArrayList<>();
+		List<Object> negative = new ArrayList<>();
+		int numPos = 0;
+		int numNeg = 0;
+		for (Long score : list) {
+			if (score > 0) {
+				numPos++;
+			} else {
+				numNeg++;
+			}
+		}
+
+		positive.add("Gewonnene Partien");
+		positive.add(numPos);
+		graphData.add(positive);
+
+		negative.add("Verlorene Partien");
+		negative.add(numNeg);
+		graphData.add(negative);
+
+		Gson gson = new Gson();
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes());
 	}
 
 	public String getProfilePageHtml(String error, String success, User user) {
