@@ -5,7 +5,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.velocity.VelocityContext;
@@ -449,7 +451,9 @@ public class HtmlProvider {
 			for (Player player2 : players) {
 				int player2Index = rounds.get(0).getPlayerIds().indexOf(player2.getId());
 				String playedWithJson = getPlayedWithEncodedJsonFromResult(results.get(numberOfPlayers * player1Index + player2Index));
+				String playedWithLineJson = getPlayedWithLineEncodedJsonFromResult(results.get(numberOfPlayers * player1Index + player2Index));
 				playerPlayedWithJsons.add(playedWithJson);
+				playerPlayedWithJsons.add(playedWithLineJson);
 			}
 			tableJsons.add(playerPlayedWithJsons);
 		}
@@ -529,6 +533,32 @@ public class HtmlProvider {
 		negative.add("Verlorene Partien");
 		negative.add(numNeg);
 		graphData.add(negative);
+
+		Gson gson = new Gson();
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes());
+	}
+
+	private String getPlayedWithLineEncodedJsonFromResult(List<Long> list) {
+		List<List<Object>> graphData = new ArrayList<>();
+
+		List<Object> legend = new ArrayList<>();
+		legend.add("Punkte je Partie");
+		legend.add("Anzahl der Partien");
+		graphData.add(legend);
+
+		Map<Long, Long> results = new HashMap<>();
+		for (Long score : list) {
+			Long numberOfOccurences = results.getOrDefault(score, Long.valueOf(0));
+			numberOfOccurences++;
+			results.put(score, numberOfOccurences);
+		}
+
+		for (Map.Entry<Long, Long> entry : results.entrySet()) {
+			List<Object> singleResult = new ArrayList<>();
+			singleResult.add(entry.getKey());
+			singleResult.add(entry.getValue());
+			graphData.add(singleResult);
+		}
 
 		Gson gson = new Gson();
 		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes());
