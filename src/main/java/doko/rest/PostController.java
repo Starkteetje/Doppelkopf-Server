@@ -198,7 +198,7 @@ public class PostController extends RequestController {
 			SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT_WEBSITE, Locale.GERMAN);
 			Game game;
 			try {
-				game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, sdf.parse(date));
+				game = new Game(id1, score1, id2, score2, id3, score3, id4, score4, submitterId, sdf.parse(date), true); // TODO allow manual upload of unranked game
 			} catch (Exception e) {
 				setError(request, "Das Spiel konnte nicht gespeichert werden. Versuche es erneut oder kontaktiere den Admin.");
 				redirectTo(response, DokoConstants.ADD_GAME_PAGE_LOCATION);

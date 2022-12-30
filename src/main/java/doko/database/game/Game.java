@@ -52,8 +52,11 @@ public class Game {
 	@Column(nullable = false)
 	private Date date;
 
+	@Column(nullable = false)
+	private boolean isRanked;
+
 	public Game(String uniqueGameId, Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
-			Long score4, Long submitterId, Date date) {
+			Long score4, Long submitterId, Date date, boolean isRanked) {
 		this.uniqueGameId = uniqueGameId;
 		this.player1 = player1;
 		this.score1 = score1;
@@ -68,17 +71,18 @@ public class Game {
 		this.date.setHours(12); // TODO shitty workaround for timezone missmatch between app and database
 		// TODO validate
 		// TODO decide whether to accept empty entries (placeholder = 0) as 0
+		this.isRanked = isRanked;
 	}
 
 	public Game(Long player1, Long score1, Long player2, Long score2, Long player3, Long score3, Long player4,
-			Long score4, Long submitterId, Date date) {
-		this(null, player1, score1, player2, score2, player3, score3, player4, score4, submitterId, date);
+			Long score4, Long submitterId, Date date, boolean isRanked) {
+		this(null, player1, score1, player2, score2, player3, score3, player4, score4, submitterId, date, isRanked);
 	}
 
 	public Game(String player1, String score1, String player2, String score2, String player3, String score3,
-			String player4, String score4, Long submitterId, Date date) {
+			String player4, String score4, Long submitterId, Date date, boolean isRanked) {
 		this(new Long(player1), new Long(score1), new Long(player2), new Long(score2), new Long(player3),
-				new Long(score3), new Long(player4), new Long(score4), submitterId, date);
+				new Long(score3), new Long(player4), new Long(score4), submitterId, date, isRanked);
 	}
 
 	public Game() {
@@ -130,5 +134,9 @@ public class Game {
 
 	public Date getDate() {
 		return date;
+	}
+
+	public boolean isRanked() {
+		return isRanked;
 	}
 }

@@ -73,6 +73,7 @@ public class JSONHandler {
 
 		SimpleDateFormat sdf = new SimpleDateFormat(DokoConstants.INPUT_DATE_FORMAT_API, Locale.GERMAN);
 		Date date = sdf.parse(json.getString(DokoConstants.API_DATE_KEY));
+		boolean isRanked = json.optBoolean(DokoConstants.API_RANKED_KEY, true);
 
 		JSONObject player1Json = json.getJSONArray(DokoConstants.API_PLAYERS_KEY).getJSONObject(0);
 		Long player1Id = getPlayerId(player1Json.getString(DokoConstants.API_PLAYER_NAME_KEY));
@@ -90,7 +91,7 @@ public class JSONHandler {
 		Optional<Long> submitted = tokenService.getUserIdOfToken(token);
 		if (submitted.isPresent()) {
 			return new Game(uniqueGameId, player1Id, score1, player2Id, score2,
-					player3Id, score3, player4Id, score4, submitted.get(), date);
+					player3Id, score3, player4Id, score4, submitted.get(), date, isRanked);
 		} else {
 			throw new IOException("Couldn't determine submitting user.");
 		}
