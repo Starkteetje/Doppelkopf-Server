@@ -24,6 +24,7 @@ import doko.database.player.PlayerService;
 import doko.database.round.RoundService;
 import doko.database.rules.Rules;
 import doko.database.rules.RulesService;
+import doko.database.season.SeasonService;
 import doko.database.token.Token;
 import doko.database.token.TokenService;
 import doko.database.user.User;
@@ -42,6 +43,8 @@ public class RequestController extends DokoController {
 	protected RoundService roundService;
 	@Autowired
 	protected RulesService rulesService;
+	@Autowired
+	protected SeasonService seasonService;
 	@Autowired
 	protected TokenService tokenService;
 	@Autowired

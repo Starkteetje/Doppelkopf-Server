@@ -48,7 +48,7 @@
 
 	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" data-playedwith='$playedWith' style="hidden"></div>
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="session.js" integrity="sha384-iVc0ifcemSyvXTJbdODcLmDhLNU87TBbCw7lnkUxNbygtCG7L1y/7VLle8bBzKwJ" crossorigin="anonymous"></script>
+    <script type="text/javascript" src="session.js" integrity="sha384-bfxDVEzbJKXm/KgJXk1vQPfWudx/DAyTGpRdAC8izZ2nyDl9PNDDoqpGOpl3hx2c" crossorigin="anonymous"></script>
 
 	<table class="noborder">
 		<tr class="noborder">

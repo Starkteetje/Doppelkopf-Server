@@ -19,6 +19,7 @@ import doko.database.game.Game;
 import doko.database.game.SortedGame;
 import doko.database.player.Player;
 import doko.database.round.Round;
+import doko.database.season.Season;
 import doko.database.user.User;
 import doko.lineup.LineUp;
 import doko.lineup.NamedLineUp;
@@ -41,6 +42,7 @@ public class GetController extends RequestController {
 		String success = consumeSuccessMessage(request);
 		String lineUpRules = getRules(lineUpString);
 		boolean isMoneyLineUp = lineUpString.equals(DokoConstants.DEFAULT_LINEUP_STRING); // TODO
+		List<Season> seasons = seasonService.getSeasonForLineUp(lineUpString);
 		NamedLineUp lineUp = playerService.getNamedLineUp(lineUpString);
 		List<SortedGame> lineUpGames = gameService.getGamesForLineUp(lineUp);
 		List<Round> rounds = new ArrayList<>();
@@ -49,29 +51,26 @@ public class GetController extends RequestController {
 		}
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-		return new ResponseEntity<>(
-				velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames, rounds, isMoneyLineUp), HttpStatus.OK);
+		return new ResponseEntity<>(velocity.getDisplayLineUpPageHtml(error, success, lineUpRules, lineUp, lineUpGames,
+				rounds, seasons, isMoneyLineUp), HttpStatus.OK);
 
 	}
 
 	@GetMapping(value = DokoConstants.GAME_PAGE_LOCATION, produces = "text/html")
-	public ResponseEntity<String> displayGame(HttpServletRequest request,
-			@RequestParam(value = "id") String gameId) {
+	public ResponseEntity<String> displayGame(HttpServletRequest request, @RequestParam(value = "id") String gameId) {
 		boolean isLoggedIn = isUserLoggedIn(request);
 		String error = consumeErrorMessage(request);
 		String success = consumeSuccessMessage(request);
 		Optional<Game> game = gameService.getGameByUniqueId(gameId);
 		if (!game.isPresent()) {
-			return new ResponseEntity<>(
-					"Spiel nicht vorhanden", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("Spiel nicht vorhanden", HttpStatus.NOT_FOUND);
 		}
 		Date date = game.get().getDate();
 		List<Round> rounds = roundService.getRoundsByUniqueGameId(gameId);
 		NamedLineUp lineUp = playerService.getNamedLineUp(new SortedGame(game.get()).getLineUp());
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-		return new ResponseEntity<>(
-				velocity.getGamePageHtml(error, success, lineUp, rounds, date), HttpStatus.OK);
+		return new ResponseEntity<>(velocity.getGamePageHtml(error, success, lineUp, rounds, date), HttpStatus.OK);
 	}
 
 	@GetMapping(value = DokoConstants.LOGIN_PAGE_LOCATION, produces = "text/html")
@@ -81,8 +80,7 @@ public class GetController extends RequestController {
 		String success = consumeSuccessMessage(request);
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-		return new ResponseEntity<>(velocity.getLoginPageHtml(error, success),
-				HttpStatus.OK);
+		return new ResponseEntity<>(velocity.getLoginPageHtml(error, success), HttpStatus.OK);
 	}
 
 	@GetMapping(value = DokoConstants.ADD_GAME_PAGE_LOCATION, produces = "text/html")
@@ -93,8 +91,7 @@ public class GetController extends RequestController {
 		List<Player> players = playerService.getAllPlayers();
 
 		HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-		return new ResponseEntity<>(
-				velocity.getReportingPageHtml(error, success, players), HttpStatus.OK);
+		return new ResponseEntity<>(velocity.getReportingPageHtml(error, success, players), HttpStatus.OK);
 	}
 
 	@GetMapping(value = DokoConstants.PROFILE_PAGE_LOCATION, produces = "text/html")
@@ -107,14 +104,14 @@ public class GetController extends RequestController {
 
 		if (user.isPresent()) {
 			HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-			return new ResponseEntity<>(
-					velocity.getProfilePageHtml(error, success, user.get()), HttpStatus.OK);
+			return new ResponseEntity<>(velocity.getProfilePageHtml(error, success, user.get()), HttpStatus.OK);
 		}
 		return ErrorPageController.getUnauthorizedPage();
 	}
 
 	@GetMapping(value = DokoConstants.PLAYER_STATS_PAGE_LOCATION, produces = "text/html")
-	public ResponseEntity<String> getPlayer(HttpServletRequest request, HttpServletResponse response, @RequestParam(value ="id") String playerIdString) {
+	public ResponseEntity<String> getPlayer(HttpServletRequest request, HttpServletResponse response,
+			@RequestParam(value = "id") String playerIdString) {
 		boolean isLoggedIn = isUserLoggedIn(request);
 		String error = consumeErrorMessage(request);
 		String success = consumeSuccessMessage(request);
@@ -128,8 +125,7 @@ public class GetController extends RequestController {
 		if (player.isPresent()) {
 			List<SortedGame> games = gameService.getGamesForPlayer(player.get());
 			HtmlProvider velocity = new HtmlProvider(gameService, playerService, roundService, isLoggedIn);
-			return new ResponseEntity<>(
-					velocity.getPlayerPageHtml(error, success, player.get(), games), HttpStatus.OK);
+			return new ResponseEntity<>(velocity.getPlayerPageHtml(error, success, player.get(), games), HttpStatus.OK);
 		} else {
 			return ErrorPageController.getPageNotFoundPage();
 		}

@@ -22,6 +22,7 @@ import doko.database.player.Player;
 import doko.database.player.PlayerService;
 import doko.database.round.Round;
 import doko.database.round.RoundService;
+import doko.database.season.Season;
 import doko.database.user.User;
 import doko.lineup.NamedLineUp;
 
@@ -32,7 +33,8 @@ public class HtmlProvider {
 	private RoundService roundService;
 	private boolean isLoggedIn;
 
-	public HtmlProvider(GameService gameService, PlayerService playerService, RoundService roundService, boolean isLoggedIn) {
+	public HtmlProvider(GameService gameService, PlayerService playerService, RoundService roundService,
+			boolean isLoggedIn) {
 		this.gameService = gameService;
 		this.playerService = playerService;
 		this.roundService = roundService;
@@ -92,7 +94,8 @@ public class HtmlProvider {
 			}
 		}
 		String averageRoundJSON = getEncodedJSONForPlayerRoundsGraph(player, availabeRounds, maxRounds);
-		String ticksJSON = getJSONForTicks(maxRounds); // NOTE the tick count is wrong, but graph still renders well. WONTFIX for now
+		String ticksJSON = getJSONForTicks(maxRounds); // NOTE the tick count is wrong, but graph still renders well.
+														// WONTFIX for now
 		String placementJson = getEncodedJSONForPlayerPlacementsGraph(player, games);
 		String signJson = getEncodedJSONForPlayerSignGraph(player, games);
 		context.put("player", player);
@@ -109,14 +112,14 @@ public class HtmlProvider {
 		return ve.getFilledTemplate(context);
 	}
 
-	public String getDisplayLineUpPageHtml(String error, String success, String lineUpRules,
-			NamedLineUp lineUp, List<SortedGame> lineUpGames, List<Round> rounds, boolean isMoneyLineUp) {
-		String displayHtml = getDisplayHtml(lineUp, lineUpGames, rounds, isMoneyLineUp, lineUpRules);
+	public String getDisplayLineUpPageHtml(String error, String success, String lineUpRules, NamedLineUp lineUp,
+			List<SortedGame> lineUpGames, List<Round> rounds, List<Season> seasons, boolean isMoneyLineUp) {
+		String displayHtml = getDisplayHtml(lineUp, lineUpGames, rounds, seasons, isMoneyLineUp, lineUpRules);
 		return getPageHtml(error, success, displayHtml);
 	}
 
-	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, List<Round> rounds, boolean isMoneyLineUp,
-			String lineUpRules) {
+	private String getDisplayHtml(NamedLineUp lineUp, List<SortedGame> lineUpGames, List<Round> rounds,
+			List<Season> seasons, boolean isMoneyLineUp, String lineUpRules) {
 		VelocityTemplateHandler ve;
 		if (lineUpGames.isEmpty()) {
 			return "In dieser Besetzung wurde kein Spiel eingetragen. Erzeugung der Übersicht nicht möglich.";
@@ -127,9 +130,15 @@ public class HtmlProvider {
 			ve = new VelocityTemplateHandler("templates/displayCasual.vm");
 		}
 
+		List<List<SortedGame>> gamesBySeason = splitGamesBySeason(lineUpGames, seasons);
+		List<SortedGame> latestSeasonGames = gamesBySeason.get(0);
+
 		String allSessionsJSON = getEncodedJSONForAllSessionsGraph(lineUp, lineUpGames);
 		String perSessionJSON = getEncodedJSONForPerSessionGraph(lineUp, lineUpGames);
 		String ticksJSON = getJSONForTicks(lineUpGames);
+		String allSessionsJSONLatest = getEncodedJSONForAllSessionsGraph(lineUp, latestSeasonGames);
+		String perSessionJSONLatest = getEncodedJSONForPerSessionGraph(lineUp, latestSeasonGames);
+		String ticksJSONLatest = getJSONForTicks(latestSeasonGames);
 
 		List<String> placementJsons = new ArrayList<>();
 		List<String> signJsons = new ArrayList<>();
@@ -140,12 +149,20 @@ public class HtmlProvider {
 			signJsons.add(signJson);
 		}
 		List<List<String>> playedWithJsons = getEncodedJSONsForPlayWithTable(lineUp.getPlayers(), rounds);
-		Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // Disable HTML escaping due to '=' in b64. b64 does not contain '<'
+		Gson gson = new GsonBuilder().disableHtmlEscaping().create(); // Disable HTML escaping due to '=' in b64. b64
+																		// does not contain '<'
 		String playedWithJsonsJson = gson.toJson(playedWithJsons);
 
 		VelocityContext context = new VelocityContext();
 		context.put("lineUp", lineUp);
-		context.put("games", lineUpGames);
+		if (isMoneyLineUp) { // TODO make independent
+			context.put("seasonGames", gamesBySeason);
+			context.put("dataForAllSessionsLatest", allSessionsJSONLatest);
+			context.put("dataPerSessionLatest", perSessionJSONLatest);
+			context.put("ticksLatest", ticksJSONLatest);
+		} else {
+			context.put("games", lineUpGames);
+		}
 		context.put("roundUrl", DokoConstants.GAME_PAGE_LOCATION);
 		context.put("playerUrl", DokoConstants.PLAYER_STATS_PAGE_LOCATION);
 		context.put("dataForAllSessions", allSessionsJSON);
@@ -160,6 +177,30 @@ public class HtmlProvider {
 		context.put("dateFormatter", new SimpleDateFormat(DokoConstants.OUTPUT_DATE_FORMAT));
 
 		return ve.getFilledTemplate(context);
+	}
+
+	private List<List<SortedGame>> splitGamesBySeason(List<SortedGame> games, List<Season> seasons) {
+		List<List<SortedGame>> gamesBySeasons = new ArrayList<>();
+		if (seasons == null || seasons.isEmpty()) {
+			gamesBySeasons.add(games);
+			return gamesBySeasons;
+		}
+		for (int i = 0; i < seasons.size(); i++) {
+			gamesBySeasons.add(new ArrayList<>());
+		}
+
+		for (SortedGame game : games) {
+			for (int i = 0; i < seasons.size(); i++) {
+				// Reverse ordering to have latest season on top
+				Season season = seasons.get(seasons.size() - i - 1);
+				if (season.contains(game)) {
+					gamesBySeasons.get(i).add(game);
+					// Allow games in multiple seasons, thus no break
+				}
+			}
+		}
+
+		return gamesBySeasons;
 	}
 
 	public String getGamePageHtml(String error, String success, NamedLineUp lineUp, List<Round> rounds, Date date) {
@@ -210,9 +251,8 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
-
 
 	private String getEncodedJSONForPerSessionGraph(NamedLineUp lineUp, List<SortedGame> lineUpGames) {
 		List<List<Object>> graphData = getGraphHeader(lineUp);
@@ -224,7 +264,7 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
 
 	private String getEncodedJSONForAllRoundsGraph(NamedLineUp lineUp, List<Round> rounds) {
@@ -248,7 +288,7 @@ public class HtmlProvider {
 			graphData.add(gameData);
 		}
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
 
 	private <E> String getJSONForTicks(List<E> list) {
@@ -296,7 +336,7 @@ public class HtmlProvider {
 				break;
 			}
 			List<Object> roundData = new ArrayList<>();
-			Float averageScore = (float)sumOfLongs(roundScore) / roundScore.size();
+			Float averageScore = (float) sumOfLongs(roundScore) / roundScore.size();
 			roundData.add(roundCounter);
 			roundData.add(averageScore);
 			graphData.add(roundData);
@@ -304,7 +344,7 @@ public class HtmlProvider {
 		}
 
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
 
 	// Assumes 4 players
@@ -333,7 +373,7 @@ public class HtmlProvider {
 		}
 
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
 
 	private String getEncodedJSONForPlayerSignGraph(Player player, List<SortedGame> games) {
@@ -375,7 +415,7 @@ public class HtmlProvider {
 		graphData.add(negativeArray);
 
 		Gson gson = new Gson();
-		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); //TODO
+		return Base64.getEncoder().encodeToString(gson.toJson(graphData).getBytes()); // TODO
 	}
 
 	private Long getScoreByPlayerId(Round round, Long playerId) {
@@ -386,7 +426,7 @@ public class HtmlProvider {
 	private Long sumOfLongs(List<Long> longs) {
 		Long sum = 0l;
 		for (Long long1 : longs) {
-			sum+= long1;
+			sum += long1;
 		}
 		return sum;
 	}
@@ -415,16 +455,14 @@ public class HtmlProvider {
 
 		List<Object> legend = new ArrayList<>();
 		legend.add("Abend");
-		legend.addAll(lineUp.getPlayers()
-				.stream()
-				.map(Player::getName)
-				.collect(Collectors.toList()));
+		legend.addAll(lineUp.getPlayers().stream().map(Player::getName).collect(Collectors.toList()));
 		graphData.add(legend);
 		return graphData;
 	}
 
 	/*
-	 * Caveats: Ignores 0-score games. Will ignore the non-solo parties of a solo. Somewhat assumes 4 players
+	 * Caveats: Ignores 0-score games. Will ignore the non-solo parties of a solo.
+	 * Somewhat assumes 4 players
 	 */
 	private List<List<String>> getEncodedJSONsForPlayWithTable(List<Player> players, List<Round> rounds) {
 		// Return null if no rounds
@@ -443,15 +481,18 @@ public class HtmlProvider {
 			updateResultList(results, round);
 		}
 
-		// Match result list to sorted players in case Round and LineUp do not have the same order
+		// Match result list to sorted players in case Round and LineUp do not have the
+		// same order
 		List<List<String>> tableJsons = new ArrayList<>();
 		for (Player player1 : players) {
 			int player1Index = rounds.get(0).getPlayerIds().indexOf(player1.getId());
-			List<String> playerPlayedWithJsons = new ArrayList<>();	
+			List<String> playerPlayedWithJsons = new ArrayList<>();
 			for (Player player2 : players) {
 				int player2Index = rounds.get(0).getPlayerIds().indexOf(player2.getId());
-				String playedWithJson = getPlayedWithEncodedJsonFromResult(results.get(numberOfPlayers * player1Index + player2Index));
-				String playedWithLineJson = getPlayedWithLineEncodedJsonFromResult(results.get(numberOfPlayers * player1Index + player2Index));
+				String playedWithJson = getPlayedWithEncodedJsonFromResult(
+						results.get(numberOfPlayers * player1Index + player2Index));
+				String playedWithLineJson = getPlayedWithLineEncodedJsonFromResult(
+						results.get(numberOfPlayers * player1Index + player2Index));
 				playerPlayedWithJsons.add(playedWithJson);
 				playerPlayedWithJsons.add(playedWithLineJson);
 			}
@@ -489,12 +530,15 @@ public class HtmlProvider {
 			updateResultsScore(results, scores.size(), negativeIndex, negativeIndex, scores.get(negativeIndex));
 			// Regular game
 		} else {
-			updateResultsScore(results, scores.size(), postiveScoreIndices.get(0), postiveScoreIndices.get(1), scores.get(postiveScoreIndices.get(0)));
-			updateResultsScore(results, scores.size(), negativeScoreIndices.get(0), negativeScoreIndices.get(1), scores.get(negativeScoreIndices.get(0)));
+			updateResultsScore(results, scores.size(), postiveScoreIndices.get(0), postiveScoreIndices.get(1),
+					scores.get(postiveScoreIndices.get(0)));
+			updateResultsScore(results, scores.size(), negativeScoreIndices.get(0), negativeScoreIndices.get(1),
+					scores.get(negativeScoreIndices.get(0)));
 		}
 	}
 
-	private void updateResultsScore(List<List<Long>> results, int numberOfPlayers, int player1Index, int player2Index, Long score) {
+	private void updateResultsScore(List<List<Long>> results, int numberOfPlayers, int player1Index, int player2Index,
+			Long score) {
 		if (player1Index == player2Index) {
 			int changeIndex = numberOfPlayers * player1Index + player1Index;
 			results.get(changeIndex).add(score);

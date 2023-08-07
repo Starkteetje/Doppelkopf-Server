@@ -1,91 +1,112 @@
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <h1>Ergebnisse</h1>
 
-#if ($games.size() > 0)
-	#set ($baseLink = $roundUrl + "?id=")
-	#set ($players = $lineUp.getPlayers())
-	<table class="results">
-		<tr class="bigborder">
-			<td class="tablehead">Spieler</td>
-			#set ($scores = [])
-			#set ($lastPlayerIndex = $players.size() - 1)
-			#set ($penalties = [])
-			#foreach ($player in $players)
-				<td class="tablehead"><a href=$playerUrl?id=$player.getId()> $player.getName() </a></td>
-				#set ($add = $scores.add(0)) #*//disable output true*#
-				#set ($add = $penalties.add(0)) #*//disable output true*#
-			#end
-		</tr>
-
-		#set ($numberOfGames = $games.size())
-		#foreach ($game in $games)
-			<tr>
-				#if ($game.getUniqueGameId() && $game.getUniqueGameId != "")
-					<td><a href="$baseLink$game.getUniqueGameId()">$dateFormatter.format($game.getDate())</a></td>
-				#else
-					<td>$dateFormatter.format($game.getDate())</td>
-				#end
-				#foreach ($i in [0..$lastPlayerIndex])
-					#set ($score = $game.getScores().get($i))
-					#set ($scores[$i] = $scores[$i] + $score)
-					#if ($score >= 0)
-						#set ($penalty = 0)
-					#elseif ($score >= -14)
-						#set ($penalty = 0.5)
-					#elseif ($score >= -24)
-						#set ($penalty = 1)
-					#elseif ($score >= -34)
-						#set ($penalty = 1.5)
-					#else
-						#set ($penalty = 2)
-					#end
-					#set ($penalties[$i] = $penalties[$i] + $penalty)
-					#if ($score >= 0)
-						<td class="good">$score</td>
-					#elseif ($score >= -24)
-						<td class="meh">$score</td>
-					#else
-						<td class="bad">$score</td>
-					#end
+#foreach ($i in [1..$seasonGames.size()])
+	#set ($seasonIdx = $i - 1)
+	#set ($seasonNumber = $seasonGames.size() - $seasonIdx)
+	#set ($games = $seasonGames.get($seasonIdx))
+	#if ($games.size() > 0)
+		#set ($baseLink = $roundUrl + "?id=")
+		#set ($players = $lineUp.getPlayers())
+		<h2>Season $seasonNumber</h2>
+		<table class="results">
+			<tr class="bigborder">
+				<td class="tablehead">Spieler</td>
+				#set ($scores = [])
+				#set ($lastPlayerIndex = $players.size() - 1)
+				#set ($penalties = [])
+				#foreach ($player in $players)
+					<td class="tablehead"><a href=$playerUrl?id=$player.getId()> $player.getName() </a></td>
+					#set ($add = $scores.add(0)) #*//disable output true*#
+					#set ($add = $penalties.add(0)) #*//disable output true*#
 				#end
 			</tr>
+
+			#set ($numberOfGames = $games.size())
+			#foreach ($game in $games)
+				<tr>
+					#if ($game.getUniqueGameId() && $game.getUniqueGameId != "")
+						<td><a href="$baseLink$game.getUniqueGameId()">$dateFormatter.format($game.getDate())</a></td>
+					#else
+						<td>$dateFormatter.format($game.getDate())</td>
+					#end
+					#foreach ($i in [0..$lastPlayerIndex])
+						#set ($score = $game.getScores().get($i))
+						#set ($scores[$i] = $scores[$i] + $score)
+						#if ($score >= 0)
+							#set ($penalty = 0)
+						#elseif ($score >= -14)
+							#set ($penalty = 0.5)
+						#elseif ($score >= -24)
+							#set ($penalty = 1)
+						#elseif ($score >= -34)
+							#set ($penalty = 1.5)
+						#else
+							#set ($penalty = 2)
+						#end
+						#set ($penalties[$i] = $penalties[$i] + $penalty)
+						#if ($score >= 0)
+							<td class="good">$score</td>
+						#elseif ($score >= -24)
+							<td class="meh">$score</td>
+						#else
+							<td class="bad">$score</td>
+						#end
+					#end
+				</tr>
+			#end
+
+			<tr class="bigborder">
+				<td>Gesamtpunktzahl</td>
+				#foreach ($score in $scores)
+					<td> $score </td>
+				#end
+			</tr>
+
+			<tr class="bigborder">
+				<td>Durchschnitt</td>
+				#foreach ($score in $scores)
+					#set ($average = $Double.parseDouble($score.toString()) / $numberOfGames)
+					<td> $doubleFormatter.format($average) </td>
+				#end
+			</tr>
+
+			<tr class="bigborder">
+				<td class="noborder">Betrag</td>
+				#foreach ($penalty in $penalties)
+					<td> $doubleFormatter.format($penalty)&euro; </td>
+				#end
+			</tr>
+		</table>
+
+		#if ($i == 1)
+			<div id="dataLatest" data-ticks="$ticksLatest" data-alldata="$dataForAllSessionsLatest" data-perdata="$dataPerSessionLatest" style="hidden"></div>
+			<h2>Statistik der aktuellen Saison</h2>
+			<table class="noborder">
+				<tr class="noborder">
+					<td class="jshost"><div id="alleAbendeLatest"></div></td>
+				</tr>
+				<tr class="noborder">
+					<td class="jshost"><div id="proAbendLatest"></div></td>
+				</tr>
+			</table>
 		#end
-
-		<tr class="bigborder">
-			<td>Gesamtpunktzahl</td>
-			#foreach ($score in $scores)
-				<td> $score </td>
-			#end
-		</tr>
-
-		<tr class="bigborder">
-			<td>Durchschnitt</td>
-			#foreach ($score in $scores)
-				#set ($average = $Double.parseDouble($score.toString()) / $numberOfGames)
-				<td> $doubleFormatter.format($average) </td>
-			#end
-		</tr>
-
-		<tr class="bigborder">
-			<td class="noborder">Betrag</td>
-			#foreach ($penalty in $penalties)
-				<td> $doubleFormatter.format($penalty)&euro; </td>
-			#end
-		</tr>
-	</table>
-
-	<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" data-playedwith='$playedWith' style="hidden"></div>
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript" src="session.js" integrity="sha384-iVc0ifcemSyvXTJbdODcLmDhLNU87TBbCw7lnkUxNbygtCG7L1y/7VLle8bBzKwJ" crossorigin="anonymous"></script>
-
-	<table class="noborder">
-		<tr class="noborder">
-			<td class="jshost"><div id="alleAbende"></div></td>
-		</tr>
-		<tr class="noborder">
-			<td class="jshost"><div id="proAbend"></div></td>
-		</tr>
-	</table>
+	#end
 #end
+
+<div id="data" data-ticks="$ticks" data-alldata="$dataForAllSessions" data-perdata="$dataPerSession" data-playerplacementdata0="$dataForPlacements.get(0)" data-playersigndata0="$dataForSigns.get(0)" data-playerplacementdata1="$dataForPlacements.get(1)" data-playersigndata1="$dataForSigns.get(1)" data-playerplacementdata2="$dataForPlacements.get(2)" data-playersigndata2="$dataForSigns.get(2)" data-playerplacementdata3="$dataForPlacements.get(3)" data-playersigndata3="$dataForSigns.get(3)" data-playedwith='$playedWith' style="hidden"></div>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="session.js" integrity="sha384-bfxDVEzbJKXm/KgJXk1vQPfWudx/DAyTGpRdAC8izZ2nyDl9PNDDoqpGOpl3hx2c" crossorigin="anonymous"></script>
+
+<h2>Ewigwährende Statistik</h2>
+<table class="noborder">
+	<tr class="noborder">
+		<td class="jshost"><div id="alleAbende"></div></td>
+	</tr>
+	<tr class="noborder">
+		<td class="jshost"><div id="proAbend"></div></td>
+	</tr>
+</table>
 
 <script type="text/javascript" src="players.js" integrity="sha384-0SOQY/M/TClyfD6I4bmJQQYXOvGBO19q4huWpymgE4cxOcbG9f+bMvnsP1Q+8CwE" crossorigin="anonymous"></script>
 
